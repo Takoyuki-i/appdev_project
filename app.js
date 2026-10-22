@@ -13,7 +13,21 @@ db.connect((err) => {
  return; 
  } 
  console.log('Connected to MySQL'); 
-}); 
+});
+
+app.get('/', (req, res) => {
+    res.render('index');
+});
+
+app.listen(3001, () => {
+    console.log('Server is running at http://localhost:3001');
+});
+
+
+app.get('/api/events', (req, res) => {
+    res.json([]);
+});
+
 
 
 app.set('view engine', 'ejs'); 

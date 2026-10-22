@@ -1,0 +1,219 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>CSPC Events Desk</title>
+
+    <link rel="stylesheet" href="/css/index.css">
+
+    <!-- FullCalendar stylesheet -->
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.19/index.global.min.css"
+    />
+</head>
+
+<body>
+
+    <!-- Navigation Bar -->
+    <header class="navbar">
+        <div class="logo">
+            <img src="/images/cspc-seal.png" alt="CSPC Seal">
+            <h2>CSPC Events Desk</h2>
+        </div>
+
+        <nav>
+            <a href="/">Home</a>
+            <a href="#calendar">Calendar</a>
+            <a href="/login">Login</a>
+            <a href="/register" class="nav-button">Sign Up</a>
+        </nav>
+    </header>
+
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <p class="eyebrow">CAMARINES SUR POLYTECHNIC COLLEGES</p>
+
+            <h1>
+                Discover What's Happening
+                <span>on Campus</span>
+            </h1>
+
+            <p class="hero-description">
+                Stay updated with campus events, student activities,
+                academic programs, and upcoming college celebrations
+                all in one place.
+            </p>
+
+            <div class="hero-buttons">
+                <a href="#calendar" class="primary-button">
+                    Explore Events
+                </a>
+
+                <a href="/register" class="secondary-button">
+                    Get Started
+                </a>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Calendar Section -->
+    <section class="calendar-section" id="calendar">
+
+        <div class="section-heading">
+            <p class="eyebrow">STAY INFORMED</p>
+
+            <h2>Campus Calendar</h2>
+
+            <p>
+                Explore upcoming campus events and activities.
+                Select a date to view scheduled events.
+            </p>
+        </div>
+
+        <div class="calendar-card">
+
+            <!-- FullCalendar displays the current month automatically -->
+            <div id="calendar"></div>
+
+            <!-- Displayed when there are no events in the visible month -->
+            <div
+                id="calendar-empty"
+                class="calendar-empty-state"
+                hidden
+            >
+                <h3>No activity for this month</h3>
+
+                <p>
+                    There are currently no campus events scheduled
+                    for this month. Check back for future activities!
+                </p>
+            </div>
+
+            <!-- Displayed if the server cannot retrieve events -->
+            <div
+                id="calendar-error"
+                class="calendar-error-state"
+                hidden
+            >
+                <p>
+                    Unable to load campus events right now.
+                    Please try again later.
+                </p>
+            </div>
+
+        </div>
+    </section>
+
+
+    <!-- Footer -->
+    <footer class="footer">
+        <h3>CSPC Events Desk</h3>
+
+        <p>
+            Your guide to campus activities and events.
+        </p>
+
+        <p class="footer-copyright">
+            &copy; <%= new Date().getFullYear() %> CSPC Events Desk.
+            All rights reserved.
+        </p>
+    </footer>
+
+
+    <!-- FullCalendar JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.19/index.global.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            const calendarElement =
+                document.getElementById('calendar');
+
+            const emptyMessage =
+                document.getElementById('calendar-empty');
+
+            const errorMessage =
+                document.getElementById('calendar-error');
+
+            const calendar = new FullCalendar.Calendar(
+                calendarElement,
+                {
+                    // Automatically uses the current month and year.
+                    initialView: 'dayGridMonth',
+
+                    height: 'auto',
+
+                    nowIndicator: true,
+
+                    headerToolbar: {
+                        left: 'prev,next today',
+                        center: 'title',
+                        right: 'dayGridMonth,timeGridWeek,listMonth'
+                    },
+
+                    buttonText: {
+                        today: 'Today',
+                        month: 'Month',
+                        week: 'Week',
+                        list: 'List'
+                    },
+
+                    // Get event information from the Express server.
+                    events: {
+                        url: '/api/events',
+                        failure: function () {
+                            emptyMessage.hidden = true;
+                            errorMessage.hidden = false;
+                        }
+                    },
+
+                    // Hide messages when navigating between months.
+                    datesSet: function () {
+                        emptyMessage.hidden = true;
+                        errorMessage.hidden = true;
+                    },
+
+                    // Show the empty-state message if the visible
+                    // calendar range has no events.
+                    eventsSet: function (events) {
+                        const viewStart =
+                            calendar.view.activeStart;
+
+                        const viewEnd =
+                            calendar.view.activeEnd;
+
+                        const hasEvents = events.some(function (event) {
+                            const eventStart = event.start;
+
+                            if (!eventStart) {
+                                return false;
+                            }
+
+                            const eventEnd = event.end || eventStart;
+
+                            return eventStart < viewEnd &&
+                                (event.end
+                                    ? eventEnd > viewStart
+                                    : eventStart >= viewStart);
+                        });
+
+                        emptyMessage.hidden = hasEvents;
+                    }
+                }
+            );
+
+            calendar.render();
+
+        });
+    </script>
+
+</body>
+</html>
+```
