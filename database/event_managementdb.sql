@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 22, 2026 at 10:46 PM
+-- Generation Time: Oct 22, 2026 at 11:11 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -48,6 +48,17 @@ CREATE TABLE `departments` (
   `departmentName` varchar(100) NOT NULL,
   `departmentCode` varchar(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `departments`
+--
+
+INSERT INTO `departments` (`departmentId`, `departmentName`, `departmentCode`) VALUES
+(1, 'College of Computer Studies', 'CCS'),
+(2, 'College of Engineering', 'CEA'),
+(3, 'College of Arts and Sciences', 'CAS'),
+(4, 'College of Health Sciences', 'CHS'),
+(5, 'College of Tourism, Hospitality and Business Management', 'CTHBM');
 
 -- --------------------------------------------------------
 
@@ -94,6 +105,14 @@ CREATE TABLE `venues` (
   `venueName` varchar(100) NOT NULL,
   `venueStatus` varchar(20) NOT NULL DEFAULT 'available'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `venues`
+--
+
+INSERT INTO `venues` (`venueId`, `venueName`, `venueStatus`) VALUES
+(1, 'Gymnasium', 'available'),
+(2, 'Auditorium', 'available');
 
 --
 -- Indexes for dumped tables
@@ -150,7 +169,7 @@ ALTER TABLE `accounts`
 -- AUTO_INCREMENT for table `departments`
 --
 ALTER TABLE `departments`
-  MODIFY `departmentId` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `departmentId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `eventorganizer`
@@ -168,7 +187,7 @@ ALTER TABLE `events`
 -- AUTO_INCREMENT for table `venues`
 --
 ALTER TABLE `venues`
-  MODIFY `venueId` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `venueId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- Constraints for dumped tables
