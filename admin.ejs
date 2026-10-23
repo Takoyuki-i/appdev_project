@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Admin - CSPC Events Desk</title>
+<style>
+:root{--bg:#eef1f8;--surface:#fff;--sunken:#e4e9f4;--ink:#0b1536;--muted:#505a78;--line:#d0d8ea;--accent:#17358a;--accent-ink:#fff;--warn:#b3261e;--ok:#17703f;--gold:#ec8101;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#050a24;--surface:#0d1637;--sunken:#09112d;--ink:#eaeefb;--muted:#9aa5c8;--line:#223060;--accent:#8fa8ff;--accent-ink:#050a24;--warn:#ff9a90;--ok:#6fd6a0;--gold:#ff9a1f;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#050a24;--surface:#0d1637;--sunken:#09112d;--ink:#eaeefb;--muted:#9aa5c8;--line:#223060;--accent:#8fa8ff;--accent-ink:#050a24;--warn:#ff9a90;--ok:#6fd6a0;--gold:#ff9a1f;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Avenir Next","Segoe UI",system-ui,sans-serif}
+.wrap{max-width:1000px;margin:0 auto;padding:18px clamp(16px,3vw,40px) 64px}
+button,input,select{font:inherit;color:inherit}
+header{display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+header img{width:52px;height:52px;object-fit:contain}
+h1{margin:0;flex:1;min-width:160px;font:800 clamp(22px,5vw,30px)/1.1 "Trebuchet MS","Segoe UI",sans-serif}
+h1 span{background:var(--gold);color:#14213d;padding:0 .2em;border-radius:3px}
+h1 small{display:block;font:600 13px/1.3 system-ui,sans-serif;color:var(--muted);margin-top:4px}
+h2{font-size:16px;margin:0 0 8px}
+.b{background:var(--accent);color:var(--accent-ink);border:0;border-radius:8px;padding:8px 14px;cursor:pointer;font-weight:700}
+.b.alt{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.b.sm{padding:6px 12px;font-size:14px}
+.tabs{display:flex;gap:4px;background:var(--sunken);padding:4px;border-radius:10px;margin-bottom:14px;width:max-content;max-width:100%;overflow-x:auto}
+.tab{border:0;background:none;padding:7px 18px;border-radius:7px;cursor:pointer;font-weight:700;color:var(--muted);white-space:nowrap}
+.tab[aria-selected="true"]{background:var(--accent);color:var(--accent-ink)}
+.panel,.row{background:var(--surface);border:1.5px solid var(--line);border-radius:12px;padding:14px;margin-bottom:10px}
+.row{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.row b{display:block}
+.pnote{font-size:13px;color:var(--muted);margin:0}
+.act{display:flex;gap:6px;flex-wrap:wrap}
+.tag{font-size:12px;font-weight:700;padding:2px 8px;border-radius:999px;border:1.5px solid var(--line)}
+.tag.pending{color:var(--gold)}.tag.approved{color:var(--ok)}.tag.rejected{color:var(--warn)}
+.empty{padding:28px 16px;text-align:center;color:var(--muted);border:2px dashed var(--line);border-radius:12px}
+select,input{background:var(--bg);border:1.5px solid var(--line);border-radius:8px;padding:8px 10px}
+label.f{display:grid;gap:4px;font-size:14px;font-weight:600;margin-bottom:10px}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,120px);background:var(--ink);color:var(--bg);padding:10px 14px;border-radius:10px;transition:transform .25s}
+.toast.on{transform:translate(-50%,0)}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <img src="cspc-seal.png" alt="CSPC seal">
+  <h1>CSPC <span>Events</span> Admin<small id="who"></small></h1>
+  <button class="b alt sm" id="back" type="button">Events page</button>
+  <button class="b alt sm" id="logout" type="button">Log out</button>
+</header>
+<nav class="tabs" aria-label="Admin sections">
+  <button class="tab" data-v="approvals" aria-selected="true" type="button">Approvals</button>
+  <button class="tab" data-v="events" aria-selected="false" type="button">All events</button>
+  <button class="tab" data-v="members" aria-selected="false" type="button">Members</button>
+  <button class="tab" data-v="contact" aria-selected="false" type="button">Contact info</button>
+</nav>
+<section id="approvals"></section>
+<section id="events" hidden></section>
+<section id="members" hidden></section>
+<section id="contact" hidden></section>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+/* Same storage keys as login.html and index.html */
+const SKEY="club-events-session",CKEY="club-events-user",LKEY="club-events-v2",NKEY="club-events-name",PRKEY="club-events-profile";
+const LOGIN="login.html",MAIN="index.html";
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fmtTime=t=>{const[h,m]=t.split(":").map(Number);return(h%12||12)+":"+String(m).padStart(2,"0")+(h<12?" am":" pm")};
+const LABEL={student:"Student",officer:"Officer",adviser:"Adviser or faculty",staff:"Staff",other:"Other"},WL={...LABEL,admin:"Admin"};
+
+/* Admin guard: only a logged-in account whose role is admin may stay */
+let me=null;try{me=JSON.parse(localStorage.getItem(CKEY))}catch(e){}
+let okSession=false;try{okSession=localStorage.getItem(SKEY)==="in"}catch(e){}
+if(!okSession||!me||me.role!=="admin")location.replace(LOGIN);
+const uid=(me&&me.id)||"";
+$("#who").textContent=(me&&(me.name||me.email))||"Administrator";
+
+/* Data (local mode, same object index.html saves) */
+let S={events:[],rs:[],roles:{},members:{},contact:{}};
+try{const j=JSON.parse(localStorage.getItem(LKEY));if(j)S={...S,...j}}catch(e){}
+S.roles=S.roles||{};S.members=S.members||{};S.contact=S.contact||{};
+const save=()=>{try{localStorage.setItem(LKEY,JSON.stringify(S))}catch(e){}render()};
+let tt;const toast=m=>{const t=$("#toast");t.textContent=m;t.classList.add("on");clearTimeout(tt);tt=setTimeout(()=>t.classList.remove("on"),4000)};
+const stOf=e=>e.status||"approved";
+const byDate=(a,b)=>(a.date+a.start).localeCompare(b.date+b.start);
+
+/* Event approval (from review / renderApprovals) */
+function review(id,status,note){
+  const e=S.events.find(x=>x.id===id);if(!e)return;
+  Object.assign(e,{status,note:note||"",reviewer:(me&&me.name)||"Admin",reviewedAt:Date.now()});
+  save();toast(status==="approved"?"Event approved and published.":"Event rejected.");
+}
+function delEvent(id){
+  const e=S.events.find(x=>x.id===id);if(!e||!confirm('Delete "'+e.title+'"?'))return;
+  S.events=S.events.filter(x=>x.id!==id);S.rs=S.rs.filter(r=>r.event!==id);save();toast("Event deleted.");
+}
+const evRow=(e,acts)=>`<div class="row"><div><b>${esc(e.title)}</b><span class="pnote">${esc(e.club)} &middot; ${esc(e.cat)} &middot; ${esc(e.date)}, ${fmtTime(e.start)} to ${fmtTime(e.end)} at ${esc(e.venue)}</span>${stOf(e)==="rejected"&&e.note?`<span class="pnote">Reason: ${esc(e.note)}</span>`:""}</div><div class="act"><span class="tag ${stOf(e)}">${stOf(e)}</span>${acts}</div></div>`;
+function renderApprovals(){
+  const q=S.events.filter(e=>stOf(e)==="pending").sort(byDate);
+  document.querySelector('[data-v="approvals"]').textContent="Approvals"+(q.length?" ("+q.length+")":"");
+  $("#approvals").innerHTML=`<div class="panel"><h2>Events waiting for Admin approval</h2><p class="pnote">Only approved events appear publicly to students.</p></div>`+
+    (q.length?q.map(e=>evRow(e,`<button class="b sm" data-a="approve" data-id="${esc(e.id)}">Approve</button><button class="b alt sm" data-a="reject" data-id="${esc(e.id)}">Reject</button>`)).join(""):'<div class="empty">Nothing is waiting for approval.</div>');
+}
+function renderEvents(){
+  const l=[...S.events].sort(byDate);
+  $("#events").innerHTML=l.length?l.map(e=>evRow(e,`<button class="b alt sm" data-a="del" data-id="${esc(e.id)}">Delete</button>`)).join(""):'<div class="empty">No events yet.</div>';
+}
+
+/* Members and roles (from renderMembers / setRole / clearPending) */
+function renderMembers(){
+  const M=S.members,R=S.roles,all=Object.entries(M).map(([id,m])=>({id,...m}));
+  Object.keys(R).forEach(id=>{if(!all.some(x=>x.id===id))all.push({id,name:R[id].name})});
+  const sub=x=>esc([x.course,x.year].filter(Boolean).join(" \u00b7 ")||"No program set");
+  const pend=all.filter(x=>x.status==="pending"&&x.id!==uid&&x.want&&x.want!=="student"&&!R[x.id]);
+  const rest=all.filter(x=>!pend.includes(x)).sort((a,b)=>(a.name||"").localeCompare(b.name||""));
+  const ph=pend.map(x=>{const w=x.want==="other"?(x.other||"Other"):WL[x.want],adm=x.want==="admin";
+    return `<div class="row"><div><b>${esc(x.name||"Unnamed")}</b><span class="pnote">${sub(x)}</span><span class="pnote">Requests: <b style="display:inline">${esc(w)}</b></span></div><div class="act">${adm?"":`<button class="b sm" data-ap="yes" data-id="${esc(x.id)}">Approve</button>`}<button class="b alt sm" data-ap="no" data-id="${esc(x.id)}">${adm?"Dismiss":"Decline"}</button></div></div>`}).join("");
+  const rh=rest.map(x=>{const r=R[x.id]?R[x.id].role:"student";
+    return `<div class="row"><div><b>${esc(x.name||"Unnamed")}</b><span class="pnote">${sub(x)}</span></div>${x.id===uid?'<span class="tag approved">You (Admin)</span>':`<select data-role="${esc(x.id)}" aria-label="Role for ${esc(x.name||"member")}">${["student","officer","adviser","staff"].map(k=>`<option value="${k}"${r===k?" selected":""}>${LABEL[k]}</option>`).join("")}${r==="other"?`<option value="other" selected>${esc(R[x.id].label||"Other")}</option>`:""}</select>`}</div>`}).join("");
+  $("#members").innerHTML=`<div class="panel"><h2>Members and roles</h2><p class="pnote">Approve role requests and change roles. Officers, advisers and staff can submit events for your approval.</p></div>`+
+    ((pend.length?`<h2>Role requests</h2>${ph}`:"")+(rest.length?`<h2>Members</h2>${rh}`:"")||'<div class="empty">No members yet.</div>');
+}
+function setRole(id,r,label){
+  const nm=(S.members[id]||{}).name||(S.roles[id]||{}).name||"";
+  if(r==="student")delete S.roles[id];else S.roles[id]={role:r,label:r==="other"?(label||"Other"):"",name:nm};
+  save();toast(r==="student"?"Back to the student role.":"Role updated.");
+}
+function clearPending(id){const m=S.members[id];if(m){S.members[id]={...m,status:"done"};save()}}
+
+/* Contact info (from putC / cdlg form) */
+function renderContact(){
+  const c=S.contact;
+  $("#contact").innerHTML=`<div class="panel"><h2>Events office contact</h2><form id="cf">
+    <label class="f">Office name<input id="cof" maxlength="60" value="${esc(c.office||"")}" placeholder="Student Affairs Office"></label>
+    <label class="f">Email<input id="cem" type="email" maxlength="80" value="${esc(c.email||"")}"></label>
+    <label class="f">Phone<input id="cph" type="tel" maxlength="30" value="${esc(c.phone||"")}"></label>
+    <label class="f">Office hours<input id="chr" maxlength="80" value="${esc(c.hours||"")}" placeholder="Mon to Fri, 8 am to 5 pm"></label>
+    <button class="b" type="submit">Save</button></form></div>`;
+}
+
+function render(){renderApprovals();renderEvents();renderMembers();if(!$("#cf"))renderContact()}
+
+/* Wiring */
+function setView(v){["approvals","events","members","contact"].forEach(k=>$("#"+k).hidden=k!==v);document.querySelectorAll(".tab").forEach(b=>b.setAttribute("aria-selected",b.dataset.v===v))}
+document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>setView(b.dataset.v));
+const onAct=e=>{
+  const b=e.target.closest("[data-a]");if(!b)return;
+  const id=b.dataset.id;
+  if(b.dataset.a==="approve")review(id,"approved");
+  else if(b.dataset.a==="reject"){const n=prompt("Reason for the organizer (optional)");if(n!==null)review(id,"rejected",n.trim())}
+  else if(b.dataset.a==="del")delEvent(id);
+};
+$("#approvals").addEventListener("click",onAct);$("#events").addEventListener("click",onAct);
+$("#members").addEventListener("click",e=>{
+  const b=e.target.closest("[data-ap]");if(!b)return;
+  const id=b.dataset.id,m=S.members[id]||{};
+  if(b.dataset.ap==="yes")setRole(id,m.want,m.other);
+  clearPending(id);
+});
+$("#members").addEventListener("change",e=>{const id=e.target.dataset.role;if(id)setRole(id,e.target.value)});
+$("#contact").addEventListener("submit",e=>{
+  e.preventDefault();
+  S.contact={office:$("#cof").value.trim(),email:$("#cem").value.trim(),phone:$("#cph").value.trim(),hours:$("#chr").value.trim()};
+  save();toast("Contact details saved.");
+});
+$("#back").onclick=()=>{location.href=MAIN};
+$("#logout").onclick=()=>{try{localStorage.setItem(SKEY,"out");localStorage.removeItem(NKEY);localStorage.removeItem(PRKEY);localStorage.removeItem(CKEY)}catch(x){}location.href=LOGIN};
+render();
+</script>
+</body>
+</html>
