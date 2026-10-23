@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -83,4 +84,91 @@
         </section>
     </main>
 </body>
+=======
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - CSPC Events Desk</title>
+    <link rel="stylesheet" href="/css/register.css">
+</head>
+<body>
+    <main class="auth">
+        <aside class="brand">
+            <img src="/images/cspc-seal.png" alt="Camarines Sur Polytechnic Colleges seal">
+            <div class="bt">CSPC <span>Events</span> Desk</div>
+            <p class="bn">Camarines Sur Polytechnic Colleges</p>
+            <p class="pnote brand-description">Join CSPC Events Desk to discover campus events and stay connected with your campus community.</p>
+        </aside>
+
+        <section class="acard" aria-labelledby="register-heading">
+            <h2 id="register-heading">Create your account</h2>
+            <p class="pnote">Enter your details to sign up for CSPC Events Desk.</p>
+
+            <% if (typeof error !== 'undefined' && error) { %>
+                <p class="err" role="alert"><%= error %></p>
+            <% } %>
+
+            <form action="/register" method="POST">
+                <label class="f" for="firstName">First name
+                    <input
+                        id="firstName"
+                        name="firstName"
+                        type="text"
+                        required
+                        autocomplete="given-name"
+                    >
+                </label>
+
+                <label class="f" for="lastName">Last name
+                    <input
+                        id="lastName"
+                        name="lastName"
+                        type="text"
+                        required
+                        autocomplete="family-name"
+                    >
+                </label>
+
+                <label class="f" for="email">Email address
+                    <input
+                        id="email"
+                        name="email"
+                        type="email"
+                        required
+                        autocomplete="email"
+                    >
+                </label>
+
+                <label class="f" for="password">Password
+                    <input
+                        id="password"
+                        name="password"
+                        type="password"
+                        required
+                        minlength="8"
+                        autocomplete="new-password"
+                    >
+                </label>
+
+                <label class="f" for="confirmPassword">Confirm password
+                    <input
+                        id="confirmPassword"
+                        name="confirmPassword"
+                        type="password"
+                        required
+                        minlength="8"
+                        autocomplete="new-password"
+                    >
+                </label>
+
+                <button class="b login-button" type="submit">Create account</button>
+            </form>
+
+            <p class="signup-link">Already have an account? <a href="/login">Log in</a></p>
+        </section>
+    </main>
+</body>
+>>>>>>> 7b0a8a96ffb27971393dc4a72d836ec72ba4046e
 </html>
