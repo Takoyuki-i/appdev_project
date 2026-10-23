@@ -28,7 +28,9 @@ app.get('/api/events', (req, res) => {
     res.json([]);
 });
 
-
+app.get('/login', (req, res) => {
+    res.render('login');
+});
 
 app.set('view engine', 'ejs'); 
 app.use(express.urlencoded({ extended: true })); 
