@@ -1,0 +1,112 @@
+:root {
+    --bg: #eef1f8;
+    --surface: #ffffff;
+    --sunken: #e4e9f4;
+    --ink: #0b1536;
+    --muted: #505a78;
+    --line: #d0d8ea;
+    --accent: #17358a;
+    --accent-ink: #ffffff;
+    --warn: #b3261e;
+    --gold: #ec8101;
+    --shadow: 0 10px 30px rgba(20, 33, 61, 0.08), 0 4px 14px rgba(20, 33, 61, 0.06);
+    color-scheme: light;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--ink);
+    font: 16px/1.5 "Avenir Next", "Segoe UI", system-ui, sans-serif;
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+        radial-gradient(540px 380px at 6% -4%, rgba(23, 53, 138, 0.16), transparent 70%),
+        radial-gradient(480px 360px at 98% 14%, rgba(236, 129, 1, 0.16), transparent 70%);
+}
+
+button,
+input {
+    font: inherit;
+    color: inherit;
+}
+
+:focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: 2px;
+}
+
+.auth {
+    min-height: 100vh;
+    max-width: 1080px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 40px;
+    align-items: center;
+    padding: 24px;
+}
+
+.brand {
+    display: grid;
+    gap: 16px;
+    justify-items: start;
+    text-align: left;
+}
+
+.brand img {
+    width: 140px;
+    height: 140px;
+    object-fit: contain;
+    filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.15));
+}
+
+.bt {
+    font: 800 clamp(36px, 5vw, 52px)/1.05 "Trebuchet MS", "Segoe UI", sans-serif;
+    letter-spacing: -0.02em;
+}
+
+.bt span {
+    background: var(--gold);
+    color: #14213d;
+    padding: 0 0.2em;
+    border-radius: 6px;
+}
+
+.bn {
+    margin: 0;
+    font-weight: 700;
+    color: var(--muted);
+    font-size: 18px;
+}
+
+.pnote {
+    font-size: 13.5px;
+    color: var(--muted);
+}
+/* Labels */
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+/* Input fields */
+input {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px;
+    margin-bottom: 18px;
+}

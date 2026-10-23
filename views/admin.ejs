@@ -1,687 +1,89 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>CSPC Events Desk</title>
-<style>
-:root{--bg:#f2f4f9;--surface:#fff;--sunken:#e9edf5;--ink:#14213d;--muted:#566078;--line:#d6dce9;--accent:#2a4bd7;--accent-ink:#fff;--warn:#b3261e;--ok:#17703f;--gold:#f2b705;
---c-Academic:#2a4bd7;--c-Social:#c2410c;--c-Arts:#7e22ce;--c-Sports:#15803d;--c-Service:#0e7490;--shadow:0 1px 2px rgba(20,33,61,.08),0 4px 14px rgba(20,33,61,.06);color-scheme:light;
-box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d1322;--surface:#161e36;--sunken:#0f162b;--ink:#e9edf8;--muted:#9ba6c4;--line:#2a3558;--accent:#8aa4ff;--accent-ink:#0d1322;--warn:#ff9a90;--ok:#6fd6a0;--c-Academic:#8aa4ff;--c-Social:#ff9a6b;--c-Arts:#d0a2ff;--c-Sports:#6fd6a0;--c-Service:#5fd3e8;--shadow:0 1px 2px rgba(0,0,0,.4);color-scheme:dark}}
-:root[data-theme="dark"]{--bg:#0d1322;--surface:#161e36;--sunken:#0f162b;--ink:#e9edf8;--muted:#9ba6c4;--line:#2a3558;--accent:#8aa4ff;--accent-ink:#0d1322;--warn:#ff9a90;--ok:#6fd6a0;--c-Academic:#8aa4ff;--c-Social:#ff9a6b;--c-Arts:#d0a2ff;--c-Sports:#6fd6a0;--c-Service:#5fd3e8;--shadow:0 1px 2px rgba(0,0,0,.4);color-scheme:dark}
-html{scroll-padding-top:env(safe-area-inset-top,0px)}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Avenir Next","Segoe UI",system-ui,sans-serif;transition:background .25s,color .25s}
-.wrap{max-width:1280px;margin:0 auto;padding:18px clamp(16px,3vw,40px) 64px}
-@media(min-width:1500px){.wrap{max-width:1440px}}
-button,input,select{font:inherit;color:inherit}
-:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
-header{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
-h1{margin:0;flex:1;min-width:150px;font:800 clamp(24px,5vw,34px)/1.1 "Trebuchet MS","Segoe UI",sans-serif;letter-spacing:-.02em}
-h1 span{background:var(--gold);color:#14213d;padding:0 .2em;border-radius:3px}
-.icon{width:42px;height:42px;display:grid;place-items:center;border:1.5px solid var(--line);background:var(--surface);border-radius:50%;cursor:pointer}
-.icon:hover{border-color:var(--ink)}
-.icon svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.b{background:var(--accent);color:var(--accent-ink);border:0;border-radius:8px;padding:9px 16px;cursor:pointer;font-weight:700}
-.b:hover{filter:brightness(1.08)}
-.b.alt{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
-.b.alt:hover{border-color:var(--ink)}
-.b.sm{padding:6px 12px;font-size:14px}
-.me{display:flex;align-items:center;gap:10px;background:var(--surface);border:1.5px solid var(--line);border-radius:10px;padding:8px 12px;margin-bottom:14px;box-shadow:var(--shadow)}
-.me label{font-size:14px;color:var(--muted);white-space:nowrap}
-.me input{flex:1;min-width:0;border:0;background:transparent;font-weight:600;padding:4px}
-.me input:focus-visible{outline-offset:4px;border-radius:4px}
-.stats{display:flex;gap:18px;flex-wrap:wrap;font-size:14px;color:var(--muted);margin:0 2px 14px}
-.stats b{color:var(--ink);font-size:16px}
-.tools{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:6px;align-items:center}
-.search{flex:1 1 200px;border:1.5px solid var(--line);background:var(--surface);border-radius:8px;padding:8px 12px;min-width:0}
-.chips{display:flex;gap:8px;overflow-x:auto;padding:8px 0 12px;scrollbar-width:none}
-.chip{flex:none;border:1.5px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 14px;cursor:pointer;font-size:14px;display:flex;gap:6px;align-items:center}
-.chip i{width:9px;height:9px;border-radius:50%;background:var(--c,var(--ink))}
-.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-h2{font-size:14px;margin:18px 0 8px;color:var(--muted);font-weight:700}
-.ev{display:grid;grid-template-columns:58px 1fr auto;gap:14px;background:var(--surface);border:1.5px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px;box-shadow:var(--shadow);transition:border-color .15s}
-.ev:hover{border-color:var(--c)}
-.dt{background:var(--sunken);border-radius:8px;text-align:center;padding:6px 0;border-top:4px solid var(--c);align-self:start}
-.dt b{display:block;font-size:22px;line-height:1.1}
-.dt span{font-size:12px;color:var(--muted)}
-.ev h3{margin:0;font-size:17px;line-height:1.3}
-.meta{color:var(--muted);font-size:14px;margin:2px 0 8px}
-.cat{color:var(--c);font-weight:700}
-.bar{height:6px;background:var(--sunken);border-radius:3px;overflow:hidden;max-width:320px}
-.bar i{display:block;height:100%;background:var(--c);transition:width .3s}
-.cnt{font-size:13px;color:var(--muted);margin-top:4px}
-.act{display:flex;flex-direction:column;gap:6px;align-items:stretch;min-width:118px}
-.status{font-size:13px;font-weight:700;color:var(--ok);text-align:center}
-.status.w{color:var(--warn)}
-.x{background:none;border:0;color:var(--muted);cursor:pointer;font-size:13px;padding:2px}
-.x:hover{color:var(--warn)}
-@media(max-width:600px){.ev{grid-template-columns:50px 1fr}.act{grid-column:1/-1;flex-direction:row;align-items:center;flex-wrap:wrap}}
-.empty{padding:32px 16px;text-align:center;color:var(--muted);border:2px dashed var(--line);border-radius:12px}
-#list{display:grid;gap:0}
-@media(min-width:1100px){
-  #list{grid-template-columns:1fr 1fr;column-gap:14px;align-items:start}
-  #list h2{grid-column:1/-1}
-  #list .empty{grid-column:1/-1}
-}
-dialog{background:var(--surface);color:var(--ink);border:1.5px solid var(--line);border-radius:14px;padding:0;width:min(440px,calc(100vw - 24px));box-shadow:0 20px 60px rgba(0,0,0,.35)}
-dialog::backdrop{background:rgba(8,12,24,.55)}
-form{padding:18px;display:grid;gap:12px}
-form h2{margin:0;font-size:19px;color:var(--ink)}
-label.f{display:grid;gap:4px;font-size:14px;font-weight:600}
-.f input,.f select{background:var(--bg);border:1.5px solid var(--line);border-radius:8px;padding:9px 10px;width:100%}
-.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.hint{font-size:13px;color:var(--muted);background:var(--sunken);border-radius:8px;padding:8px 10px}
-.hint.bad{color:var(--warn);outline:1.5px solid var(--warn)}
-.err{color:var(--warn);font-size:14px;min-height:1.3em}
-.btns{display:flex;gap:8px;justify-content:flex-end}
-.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,120px);background:var(--ink);color:var(--bg);padding:10px 14px;border-radius:10px;display:flex;gap:12px;align-items:center;transition:transform .25s;z-index:60;max-width:calc(100vw - 24px)}
-.toast.on{transform:translate(-50%,0)}
-.toast button{background:none;border:0;color:var(--gold);font-weight:700;cursor:pointer}
-@media(prefers-reduced-motion:reduce){*{transition:none!important}}
-small.sub{display:block;font:600 13px/1.3 "Avenir Next","Segoe UI",system-ui,sans-serif;color:var(--muted);letter-spacing:0;margin-top:4px}
-[hidden]{display:none!important}
-.tabs{display:flex;gap:4px;background:var(--sunken);padding:4px;border-radius:10px;margin-bottom:14px;width:max-content;max-width:100%;overflow-x:auto;scrollbar-width:none}
-.tab{border:0;background:none;padding:7px 18px;border-radius:7px;cursor:pointer;font-weight:700;color:var(--muted);white-space:nowrap;transition:background .15s,color .15s,box-shadow .15s}
-.tab[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
-#dash{display:grid;gap:14px}
-.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
-@media(min-width:1100px){.kpis{grid-template-columns:repeat(4,1fr)}}
-.kpi{background:var(--surface);border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;box-shadow:var(--shadow)}
-.kpi b{display:block;font-size:26px;line-height:1.1}
-.kpi span{font-size:13px;color:var(--muted)}
-.panels{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
-@media(min-width:1200px){.panels{grid-template-columns:repeat(3,1fr)}}
-.panel{background:var(--surface);border:1.5px solid var(--line);border-radius:12px;padding:14px;box-shadow:var(--shadow)}
-.panel.wide{grid-column:1/-1}
-.panel h2{margin:0 0 10px;color:var(--ink);font-size:16px}
-.br{display:grid;grid-template-columns:minmax(80px,38%) 1fr auto;gap:10px;align-items:center;margin:8px 0;font-size:14px}
-.br span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.bt{height:10px;background:var(--sunken);border-radius:5px;overflow:hidden}
-.bt i{display:block;height:100%;border-radius:5px;transition:width .3s}
-.br b{font-variant-numeric:tabular-nums;font-size:13px}
-.cols{display:flex;gap:8px;align-items:end;height:160px}
-.col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:end;gap:4px;font-size:12px;color:var(--muted);text-align:center}
-.col i{width:100%;max-width:38px;background:var(--accent);border-radius:5px 5px 0 0}
-.col b{color:var(--ink);font-size:13px}
-.note{font-size:14px;padding:8px 0;border-top:1px solid var(--line)}
-.note:first-of-type{border-top:0}
-.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.sw{display:flex;flex-direction:column;gap:8px;align-items:flex-start;text-align:left;padding:12px;border:2px solid;border-radius:10px;cursor:pointer}
-.sw .dots{display:flex;gap:6px}
-.sw .dots i{width:22px;height:22px;border-radius:50%}
-.sw small{font-size:12px;opacity:.8}
-.sw[aria-pressed="true"]{outline:3px solid var(--accent);outline-offset:2px}
-.pnote{font-size:13px;color:var(--muted);margin:0}
-.logo{width:56px;height:56px;flex:none;display:block}
-.logo img{width:100%;height:100%;object-fit:contain;display:block;filter:drop-shadow(0 1px 2px rgba(0,0,0,.25))}
-.calh{display:flex;align-items:center;gap:8px;margin-bottom:10px}
-.calh h2{flex:1;margin:0;color:var(--ink);font-size:18px}
-.calh .icon{font-size:22px;line-height:1}
-.cg{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
-.cw{font-size:12px;color:var(--muted);text-align:center;font-weight:700;padding-bottom:2px}
-.cd{min-height:84px;background:var(--surface);border:1.5px solid var(--line);border-radius:8px;padding:4px;text-align:left;cursor:pointer;overflow:hidden;display:flex;flex-direction:column;gap:2px;font-size:12px}
-@media(min-width:1100px){.cd{min-height:120px}}
-.cd:hover{border-color:var(--ink)}
-.cd[aria-pressed="true"]{outline:3px solid var(--accent);outline-offset:1px}
-.cd b{width:22px;height:22px;display:grid;place-items:center;font-size:12px;border-radius:50%}
-.cd.today b{background:var(--accent);color:var(--accent-ink)}
-.ce{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-left:3px solid var(--c);padding-left:4px;background:var(--sunken);border-radius:3px}
-.more{color:var(--muted)}
-.mk{display:none;gap:2px;flex-wrap:wrap}
-.mk i{width:6px;height:6px;border-radius:50%;background:var(--c)}
-@media(max-width:600px){.cd{min-height:52px;align-items:center}.ce,.more{display:none}.mk{display:flex;justify-content:center}}
-#profile,#about,#contacts{display:grid;gap:14px}
-.pr{display:flex;gap:14px;align-items:flex-start}
-.pf{flex:1;display:grid;gap:10px;min-width:0}
-.ava{width:56px;height:56px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:800;font-size:20px;flex:none}
-.kv{display:grid;grid-template-columns:96px 1fr;gap:8px;margin:8px 0;font-size:15px}
-.kv>:first-child{color:var(--muted)}
-.panel p{margin:8px 0}
-.panel ul{margin:8px 0;padding-left:20px}
-.panel li{margin:5px 0}
-.panel a{color:var(--accent);font-weight:600}
-.arow{display:flex;gap:14px;align-items:center}
-.arow img{width:64px;height:64px;flex:none}
-@media(max-width:600px){.pr{flex-direction:column}}
-body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(540px 380px at 6% -4%,color-mix(in srgb,var(--accent) 24%,transparent),transparent 70%),radial-gradient(480px 360px at 98% 14%,color-mix(in srgb,var(--gold) 22%,transparent),transparent 70%),radial-gradient(520px 380px at 40% 108%,color-mix(in srgb,var(--accent) 14%,transparent),transparent 70%)}
-.ev,.panel,.kpi,.cd,.empty{background:color-mix(in srgb,var(--surface) 76%,transparent);border-color:color-mix(in srgb,var(--line) 85%,transparent)}
-.tabs{position:sticky;top:8px;z-index:6;background:color-mix(in srgb,var(--surface) 58%,transparent);border:1px solid color-mix(in srgb,var(--ink) 10%,transparent);-webkit-backdrop-filter:blur(14px) saturate(1.4);backdrop-filter:blur(14px) saturate(1.4);box-shadow:var(--shadow);border-color:color-mix(in srgb,var(--accent) 32%,transparent)}
-.tab[aria-selected="true"]{background:color-mix(in srgb,var(--surface) 88%,transparent)}
-.tab:hover{background:color-mix(in srgb,var(--accent) 16%,transparent);color:var(--ink)}
-.tab[aria-selected="true"]{background:var(--accent);color:var(--accent-ink);box-shadow:0 2px 10px color-mix(in srgb,var(--accent) 50%,transparent)}
-.tab[aria-selected="true"]:hover{background:var(--accent);color:var(--accent-ink)}
-.icon,.chip,.search,.b.alt{background:color-mix(in srgb,var(--surface) 62%,transparent);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
-.chip[aria-pressed="true"]{background:var(--ink)}
-dialog{background:color-mix(in srgb,var(--surface) 80%,transparent);-webkit-backdrop-filter:blur(20px) saturate(1.3);backdrop-filter:blur(20px) saturate(1.3);border-color:color-mix(in srgb,var(--ink) 14%,transparent)}
-dialog::backdrop{background:rgba(8,12,24,.38);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
-.f input,.f select{background:color-mix(in srgb,var(--bg) 65%,transparent)}
-.toast{background:color-mix(in srgb,var(--ink) 84%,transparent);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
-@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){dialog{background:var(--surface)}.tabs{background:var(--sunken)}.toast{background:var(--ink)}}
-@media(prefers-reduced-transparency:reduce){.ev,.panel,.kpi,.cd,.empty,dialog,.tabs,.icon,.chip,.search,.b.alt{background:var(--surface);-webkit-backdrop-filter:none;backdrop-filter:none}.toast{background:var(--ink)}}
-.role{font-weight:700;margin:10px 0 0}
-.mrow{display:flex;gap:12px;align-items:center;justify-content:space-between;padding:10px 0;border-top:1px solid var(--line)}
-.mrow:first-child{border-top:0}
-.mrow select{width:auto;min-width:120px;background:color-mix(in srgb,var(--bg) 65%,transparent);border:1.5px solid var(--line);border-radius:8px;padding:7px 10px}
-.act2{display:flex;gap:6px;flex-wrap:wrap}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Review | CSPC Events Desk</title>
+  <link rel="stylesheet" href="/css/admin.css">
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.19/index.global.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.19/index.global.min.js" defer></script>
+  <script src="/js/admin.js" defer></script>
 </head>
 <body>
-<div class="wrap">
-<header>
-  <span class="logo"><img src="cspc-seal.png" alt="Camarines Sur Polytechnic Colleges seal" width="56" height="56"></span>
-  <h1>CSPC <span>Events</span> Desk<small class="sub">Camarines Sur Polytechnic Colleges</small></h1>
-  <button class="icon" id="palbtn" type="button" aria-label="Choose color palette" title="Choose color palette"><svg viewBox="0 0 24 24"><circle cx="8" cy="10" r="1.2"/><circle cx="12" cy="7.5" r="1.2"/><circle cx="16" cy="10" r="1.2"/><path d="M12 3a9 9 0 1 0 0 18c1.5 0 2-1 1.5-2s.2-2.5 1.7-2.5H18a3 3 0 0 0 3-3C21 7 17 3 12 3z"/></svg></button>
-  <button class="icon" id="theme" type="button"></button>
-  <button class="icon" id="logout" type="button" aria-label="Log out" title="Log out"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg></button>
-  <button class="b" id="new" type="button">New event</button>
-</header>
-<nav class="tabs" aria-label="View"><button class="tab" data-v="events" aria-selected="true" type="button">Events</button><button class="tab" data-v="cal" aria-selected="false" type="button">Calendar</button><button class="tab" data-v="dash" aria-selected="false" type="button">Dashboard</button><button class="tab" data-v="about" aria-selected="false" type="button">About</button><button class="tab" data-v="contacts" aria-selected="false" type="button">Contacts</button><button class="tab" data-v="approvals" aria-selected="false" type="button" hidden>Approvals</button><button class="tab" data-v="members" aria-selected="false" type="button" hidden>Members</button><button class="tab" data-v="profile" aria-selected="false" type="button">Profile</button></nav>
-<div id="evview"><div class="stats" id="stats"></div>
-<div class="tools">
-  <input class="search" id="q" type="search" placeholder="Search events, clubs, venues" aria-label="Search events">
-  <button class="chip" id="mine" aria-pressed="false" type="button">My RSVPs</button>
-</div>
-<div class="chips" id="chips" role="group" aria-label="Filter by category"></div>
-<main id="list" aria-live="polite"></main></div>
-<section id="cal" aria-label="Calendar" hidden></section>
-<section id="dash" aria-label="Dashboard" hidden></section>
-<section id="profile" aria-label="Profile" hidden>
-  <div class="panel"><div class="pr"><div class="ava" id="ava">?</div><div class="pf">
-    <label class="f">Name<input id="me" placeholder="Your name" autocomplete="name" maxlength="40"></label>
-    <div class="two">
-      <label class="f">Course or program<select id="pcourse"></select></label>
-      <label class="f">Year level<select id="pyear"><option value="">Select</option><option>1st year</option><option>2nd year</option><option>3rd year</option><option>4th year</option><option>Graduate</option><option>Faculty or staff</option></select></label>
-    </div><label class="f" id="potherl" hidden>Program name<input id="pother" maxlength="60" placeholder="Type your program"></label></div></div>
-    <p class="pnote">Saved on this device. Your name, course and year are attached to your RSVPs so organizers know who is coming.</p>
-    <p class="role" id="rolenote"></p>
-    <button class="b alt sm" type="button" id="reg" style="margin-top:10px">Change role or sign-up details</button>
-    <button class="b alt sm" type="button" id="logout2" style="margin:10px 0 0 8px">Log out</button></div>
-  <div id="pdyn"></div>
-</section>
-<section id="about" aria-label="About" hidden>
-  <div class="panel"><h2>About CSPC Events Desk</h2>
-    <p>One place for clubs and offices to post events, and for students to find them and reserve a spot.</p>
-    <ul><li>Browse events by date, category or club, or open the calendar.</li>
-    <li>RSVP in one tap. When an event is full you join a waitlist and move up automatically if someone cancels.</li>
-    <li>Organizers add and edit events, and the desk blocks double-booked venues.</li>
-    <li>The dashboard shows how full events are, how venues are used, and which events need promotion.</li></ul></div>
-  <div class="panel"><div class="arow"><img id="alogo" alt="Camarines Sur Polytechnic Colleges seal"><div><h2 style="margin:0">Camarines Sur Polytechnic Colleges</h2><span class="pnote">Nabua, Camarines Sur</span></div></div>
-    <p>CSPC is a public college in Nabua, Camarines Sur, established in 1983 under Batas Pambansa Blg. 512. It has a branch campus in Buhi.</p>
-    <p>Under Republic Act 11283 the college was converted into the Polytechnic State University of Bicol.</p></div>
-</section>
-<section id="approvals" aria-label="Approvals" hidden><div id="adyn"></div></section>
-<section id="members" aria-label="Members and roles" hidden>
-  <div class="panel"><h2>Members and roles</h2>
-    <p class="pnote">People appear here after their first RSVP. Officers can add events and manage their own. Admins are the people you invite as Editors in the sharing settings.</p>
-    <div id="mdyn"></div></div>
-</section>
-<section id="contacts" aria-label="Contacts" hidden>
-  <div class="panel" id="cdyn"></div>
-  <div class="panel"><h2>Camarines Sur Polytechnic Colleges</h2>
-    <div class="kv"><span>Address</span><span>San Miguel, Nabua, Camarines Sur 4434, Philippines</span></div>
-    <div class="kv"><span>Website</span><a href="https://www.cspc.edu.ph" target="_blank" rel="noopener">www.cspc.edu.ph</a></div>
-    <div class="kv"><span>Campuses</span><span>Main campus in Nabua, branch campus in Buhi</span></div>
-    <p class="pnote">For phone numbers and office emails, check the school website.</p></div>
-</section>
-</div>
+  <div class="admin-shell">
+    <aside class="sidebar">
+      <a class="brand" href="/" aria-label="CSPC Events Desk homepage">
+        <img src="/images/cspc-seal.png" alt="CSPC seal" onerror="this.hidden=true">
+        <span><strong>CSPC <em>Events</em> Desk</strong><small>ADMINISTRATION</small></span>
+      </a>
+      <div class="admin-label"><span class="admin-dot"></span> ADMIN WORKSPACE</div>
+      <nav class="side-nav" aria-label="Admin navigation">
+        <button class="nav-item active" type="button" data-view="approvals"><span class="nav-icon">✓</span> Event proposals <span class="nav-count" id="pending-count">—</span></button>
+        <button class="nav-item" type="button" data-view="calendar"><span class="nav-icon">▦</span> Calendar</button>
+      </nav>
+      <div class="sidebar-note">
+        <span class="note-mark">!</span>
+        <strong>Your role</strong>
+        <p>Review and approve or reject event proposals. Approved events are published to the public calendar.</p>
+      </div>
+      <a class="back-link" href="/">← Back to public website</a>
+    </aside>
 
-<dialog id="dlg"><form id="f" method="dialog">
-  <h2 id="ftitle">New event</h2>
-  <label class="f">Title<input name="title" required maxlength="60"></label>
-  <label class="f">Club or organization<input name="club" required maxlength="40"></label>
-  <div class="two">
-    <label class="f">Category<select name="cat"></select></label>
-    <label class="f">Capacity<input name="cap" type="number" min="1" max="2000" value="30" required></label>
+    <main class="main-area">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">CSPC EVENTS DESK / ADMIN</p>
+          <h1 id="page-title">Event proposals</h1>
+          <p class="page-subtitle" id="page-subtitle">Review submissions before they appear on the public calendar.</p>
+        </div>
+        <div class="top-actions">
+          <span class="admin-pill"><span></span> Admin</span>
+          <button class="icon-button" id="refresh-button" type="button" title="Refresh proposals" aria-label="Refresh proposals">↻</button>
+          <a class="logout-link" href="/logout">Log out</a>
+        </div>
+      </header>
+
+      <section class="stats-grid" aria-label="Proposal summary">
+        <article class="stat-card"><span class="stat-label">Awaiting review</span><strong id="stat-pending">—</strong><span class="stat-foot">Requires your decision</span></article>
+        <article class="stat-card"><span class="stat-label">Approved</span><strong id="stat-approved">—</strong><span class="stat-foot">Eligible for publication</span></article>
+        <article class="stat-card"><span class="stat-label">Rejected</span><strong id="stat-rejected">—</strong><span class="stat-foot">Not shown publicly</span></article>
+      </section>
+
+      <section id="approvals-view" class="content-view">
+        <div class="section-heading">
+          <div><h2>Submissions to review</h2><p>Check the event details before making a decision.</p></div>
+          <label class="search-box"><span aria-hidden="true">⌕</span><input id="proposal-search" type="search" placeholder="Search proposals" aria-label="Search proposals"></label>
+        </div>
+        <div class="filter-row" role="group" aria-label="Proposal status filter">
+          <button class="filter-button active" type="button" data-status="pending">Pending</button>
+          <button class="filter-button" type="button" data-status="approved">Approved</button>
+          <button class="filter-button" type="button" data-status="rejected">Rejected</button>
+        </div>
+        <div id="proposal-list" class="proposal-list" aria-live="polite">
+          <div class="loading-state"><span class="spinner"></span> Loading event proposals…</div>
+        </div>
+      </section>
+
+      <section id="calendar-view" class="content-view" hidden>
+        <div class="section-heading calendar-heading"><div><h2>Events calendar</h2><p>This uses the same FullCalendar library as the public homepage and shows approved events only.</p></div></div>
+        <div class="calendar-panel"><div id="admin-calendar"></div></div>
+      </section>
+
+      <footer class="page-footer"><span>CSPC Events Desk</span><span>Admin review workspace</span></footer>
+    </main>
   </div>
-  <label class="f">Venue<select name="venue"></select></label>
-  <label class="f">Date<input name="date" type="date" required></label>
-  <div class="two">
-    <label class="f">Starts<input name="start" type="time" value="17:00" required></label>
-    <label class="f">Ends<input name="end" type="time" value="19:00" required></label>
-  </div>
-  <div class="hint" id="hint"></div>
-  <div class="err" id="err" role="alert"></div>
-  <div class="btns"><button class="b alt" type="button" id="cancel">Cancel</button><button class="b" type="submit" id="fsub">Add event</button></div>
-</form></dialog>
 
-<dialog id="nd"><form id="nf" method="dialog">
-  <h2>Who's going?</h2>
-  <label class="f">Your name<input id="nname" required maxlength="40" autocomplete="name"></label>
-  <div class="btns"><button class="b alt" type="button" id="ncancel">Cancel</button><button class="b" type="submit">Save and RSVP</button></div>
-</form></dialog>
+  <dialog id="decision-dialog" class="decision-dialog">
+    <form id="decision-form">
+      <div class="dialog-mark" id="dialog-mark">✓</div>
+      <h2 id="dialog-title">Approve this event?</h2>
+      <p id="dialog-description">This decision will update the event proposal status.</p>
+      <label class="field-label" id="reason-label" for="decision-reason">Reason for declining <span>(optional)</span></label>
+      <textarea id="decision-reason" rows="3" maxlength="500" placeholder="Explain what needs to be changed…"></textarea>
+      <p id="dialog-error" class="dialog-error" role="alert"></p>
+      <div class="dialog-actions"><button class="button secondary" id="cancel-decision" type="button">Cancel</button><button class="button primary" id="confirm-decision" type="submit">Confirm</button></div>
+    </form>
+  </dialog>
 
-<dialog id="pd"><form method="dialog">
-  <h2>Color palette</h2>
-  <div class="pgrid" id="pgrid"></div>
-  <p class="pnote">Every palette has a light and a dark version. Use the moon or sun button to switch.</p>
-  <div class="btns"><button class="b" type="submit">Done</button></div>
-</form></dialog>
-<dialog id="rdlg"><form id="rf" method="dialog">
-  <h2>Reject event</h2>
-  <label class="f">Reason for the organizer (optional)<input id="rnote" maxlength="120" placeholder="e.g. Venue is needed for an exam"></label>
-  <div class="btns"><button class="b alt" type="button" id="rcancel">Cancel</button><button class="b" type="submit">Reject</button></div>
-</form></dialog>
-<dialog id="cdlg"><form id="cf" method="dialog">
-  <h2>Events office contact</h2>
-  <label class="f">Office name<input id="cof" maxlength="60" placeholder="Student Affairs Office"></label>
-  <label class="f">Email<input id="cem" type="email" maxlength="80"></label>
-  <label class="f">Phone<input id="cph" type="tel" maxlength="30"></label>
-  <label class="f">Office hours<input id="chr" maxlength="80" placeholder="Mon to Fri, 8 am to 5 pm"></label>
-  <div class="btns"><button class="b alt" type="button" id="ccancel">Cancel</button><button class="b" type="submit">Save</button></div>
-</form></dialog>
-
-<div class="toast" id="toast" role="status"><span id="tmsg"></span><button id="tundo" type="button">Undo</button></div>
-
-<script>
-try{if((localStorage.getItem("club-events-session")||"out")==="out")location.replace("login.html")}catch(e){}
-const CATS=["Academic","Social","Arts","Sports","Service"];
-const VENUES=["Student Union Hall","Library Room 2","Main Gym","Science Atrium","Open Quad"];
-const KEY="club-events-v1",TKEY="club-events-theme";
-const $=s=>document.querySelector(s);
-const iso=d=>{const x=new Date();x.setDate(x.getDate()+d);return x.getFullYear()+"-"+String(x.getMonth()+1).padStart(2,"0")+"-"+String(x.getDate()).padStart(2,"0")};
-const LKEY="club-events-v2",NKEY="club-events-name";
-let filter="All",mineOnly=false,query="",pending=null,undo=null,tt,editing=null,sel=null;
-let mReady=false;
-let calM=new Date();calM.setDate(1);
-let db=null,uid=(()=>{try{return JSON.parse(localStorage.getItem("club-events-user")).id||"local"}catch(e){return"local"}})(),canEdit=false,S={events:[],rs:[],roles:{},members:{}},myName="";
-try{myName=localStorage.getItem(NKEY)||""}catch(e){}
-try{const j=JSON.parse(localStorage.getItem(LKEY));if(j&&j.events&&j.rs)S=j}catch(e){}
-S.members=S.members||{};S.roles=S.roles||{};
-const saveLocal=()=>{try{localStorage.setItem(LKEY,JSON.stringify(S))}catch(e){}};
-const fail=x=>toast("Couldn't save: "+((x&&x.message)||"please try again")+".");
-
-/* palettes */
-const PKEY="club-events-pal";
-let pal="cspc";try{pal=localStorage.getItem(PKEY)||"cspc"}catch(e){}
-const PAL={
-cspc:{n:"CSPC Seal",
- l:{accent:"#17358a","accent-ink":"#fff",gold:"#ec8101",bg:"#eef1f8",surface:"#fff",sunken:"#e4e9f4",line:"#d0d8ea",ink:"#0b1536",muted:"#505a78"},
- d:{accent:"#8fa8ff","accent-ink":"#050a24",gold:"#ff9a1f",bg:"#050a24",surface:"#0d1637",sunken:"#09112d",line:"#223060",ink:"#eaeefb",muted:"#9aa5c8"}},
-blue:{n:"Classic Blue",
- l:{accent:"#2a4bd7","accent-ink":"#fff",gold:"#f2b705",bg:"#f2f4f9",surface:"#fff",sunken:"#e9edf5",line:"#d6dce9",ink:"#14213d",muted:"#566078"},
- d:{accent:"#8aa4ff","accent-ink":"#0d1322",gold:"#f2b705",bg:"#0d1322",surface:"#161e36",sunken:"#0f162b",line:"#2a3558",ink:"#e9edf8",muted:"#9ba6c4"}},
-forest:{n:"Forest",
- l:{accent:"#1f7a4d","accent-ink":"#fff",gold:"#e8b923",bg:"#eff4f0",surface:"#fff",sunken:"#e2ebe4",line:"#cfdcd2",ink:"#12261a",muted:"#52645a"},
- d:{accent:"#6fd6a0","accent-ink":"#0c1712",gold:"#e8b923",bg:"#0c1712",surface:"#14231b",sunken:"#0e1a14",line:"#25392d",ink:"#e6f1ea",muted:"#94ab9d"}},
-maroon:{n:"Maroon and Gold",
- l:{accent:"#8c1d2f","accent-ink":"#fff",gold:"#f2b705",bg:"#f7f1f1",surface:"#fff",sunken:"#efe3e4",line:"#e0d0d2",ink:"#2a1217",muted:"#6b5459"},
- d:{accent:"#ff8fa0","accent-ink":"#1a0e11",gold:"#f2b705",bg:"#1a0e11",surface:"#26161a",sunken:"#1f1215",line:"#43272d",ink:"#f5e9eb",muted:"#bfa3a8"}},
-ocean:{n:"Ocean",
- l:{accent:"#0e7490","accent-ink":"#fff",gold:"#f2b705",bg:"#eef6f8",surface:"#fff",sunken:"#e0eef2",line:"#cbe0e6",ink:"#0f2a33",muted:"#4f6b74"},
- d:{accent:"#5fd3e8","accent-ink":"#08171c",gold:"#f2b705",bg:"#08171c",surface:"#0f232a",sunken:"#0a1c22",line:"#1f3b44",ink:"#e3f2f6",muted:"#8fb0ba"}},
-violet:{n:"Violet",
- l:{accent:"#6d28d9","accent-ink":"#fff",gold:"#ff9f1c",bg:"#f5f2fb",surface:"#fff",sunken:"#ebe5f6",line:"#d9d0ec",ink:"#1e1535",muted:"#605879"},
- d:{accent:"#b79cff","accent-ink":"#120d20",gold:"#ff9f1c",bg:"#120d20",surface:"#1c1530",sunken:"#150f26",line:"#32284f",ink:"#efeaff",muted:"#aaa0c9"}}
-};
-function applyPal(){
-  const r=document.documentElement.style,p=(PAL[pal]||PAL.blue)[isDark()?"d":"l"];
-  for(const k in p)r.setProperty("--"+k,p[k]);
-}
-function renderPal(){
-  $("#pgrid").innerHTML=Object.entries(PAL).map(([k,p])=>{const c=p[isDark()?"d":"l"];
-    return `<button type="button" class="sw" data-p="${k}" aria-pressed="${k===pal}" style="background:${c.surface};color:${c.ink};border-color:${c.line}"><span class="dots"><i style="background:${c.bg};outline:1px solid ${c.line}"></i><i style="background:${c.accent}"></i><i style="background:${c.gold}"></i></span><b>${p.n}</b>${k===pal?"<small>Selected</small>":""}</button>`}).join("");
-}
-$("#palbtn").onclick=()=>{renderPal();$("#pd").showModal()};
-$("#pgrid").addEventListener("click",e=>{const b=e.target.closest("[data-p]");if(!b)return;pal=b.dataset.p;try{localStorage.setItem(PKEY,pal)}catch(x){}paintTheme();renderPal()});
-
-/* theme */
-const SUN='<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
-const MOON='<svg viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>';
-const mq=matchMedia("(prefers-color-scheme: dark)");
-function isDark(){const t=document.documentElement.dataset.theme;return t?t==="dark":mq.matches}
-function paintTheme(){applyPal();const d=isDark(),b=$("#theme");b.innerHTML=d?SUN:MOON;b.setAttribute("aria-label",d?"Switch to light mode":"Switch to dark mode");b.title=b.getAttribute("aria-label")}
-try{const t=localStorage.getItem(TKEY);if(t)document.documentElement.dataset.theme=t}catch(e){}
-$("#theme").onclick=()=>{const n=isDark()?"light":"dark";document.documentElement.dataset.theme=n;try{localStorage.setItem(TKEY,n)}catch(e){}paintTheme()};
-mq.addEventListener("change",paintTheme);paintTheme();
-
-/* helpers */
-const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const D=d=>new Date(d+"T00:00");
-const fmtTime=t=>{const[h,m]=t.split(":").map(Number);return(h%12||12)+":"+String(m).padStart(2,"0")+(h<12?" am":" pm")};
-function dayLabel(d){if(d===iso(0))return"Today";if(d===iso(1))return"Tomorrow";return D(d).toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric"})}
-function toast(msg,undoFn){$("#tmsg").textContent=msg;undo=undoFn;$("#tundo").style.display=undoFn?"":"none";$("#toast").classList.add("on");clearTimeout(tt);tt=setTimeout(()=>$("#toast").classList.remove("on"),5000)}
-$("#tundo").onclick=()=>{if(undo)undo();undo=null;$("#toast").classList.remove("on")};
-
-/* data layer */
-async function initData(){
-  try{
-    const[d,u]=await Promise.all([claude.use("db"),claude.use("user")]);
-    if(d&&u){
-      db=d;uid=(await u.id())||"";canEdit=await u.canEdit();
-      db.collection("events").onSnapshot(s=>{S.events=s.docs.map(x=>({id:x.id,...x.data()}));render()},()=>{});
-      db.collection("rsvps").onSnapshot(s=>{S.rs=s.docs.map(x=>({id:x.id,...x.data()}));render()},()=>{});
-      db.doc("settings/contact").onSnapshot(s=>{S.contact=s.exists?s.data():{};render()},()=>{});
-      db.collection("roles").onSnapshot(s=>{S.roles=Object.fromEntries(s.docs.map(x=>[x.id,x.data()]));render()},()=>{});
-      db.collection("members").onSnapshot(s=>{S.members=Object.fromEntries(s.docs.map(x=>[x.id,x.data()]));mReady=true;syncSignup();render()},()=>{});
-    }
-  }catch(e){}
-  if(!db){
-    let uRole="student";
-    try{const uRec=JSON.parse(localStorage.getItem("club-events-user"));if(uRec)uRole=uRec.role||"student"}catch(e){}
-    canEdit=(uRole==="admin");
-    mReady=true;syncSignup();
-  }
-  render();
-}
-async function putE(e){if(db){try{await db.collection("events").doc(e.id).set(e)}catch(x){fail(x)}}else{const i=S.events.findIndex(v=>v.id===e.id);if(i<0)S.events.push(e);else S.events[i]=e;saveLocal();render()}}
-async function dropE(id){if(db){try{await db.collection("events").doc(id).delete()}catch(x){fail(x)}}else{S.events=S.events.filter(v=>v.id!==id);saveLocal();render()}}
-async function putR(r){if(db){try{await db.collection("rsvps").doc(r.id).set(r)}catch(x){fail(x)}}else{S.rs=S.rs.filter(v=>v.id!==r.id);S.rs.push(r);saveLocal();render()}}
-async function dropR(id){if(db){try{await db.collection("rsvps").doc(id).delete()}catch(x){fail(x)}}else{S.rs=S.rs.filter(v=>v.id!==id);saveLocal();render()}}
-const EV=()=>S.events.map(e=>{const r=S.rs.filter(x=>x.event===e.id).sort((a,b)=>a.at-b.at);return{...e,going:r.slice(0,e.cap),wait:r.slice(e.cap)}});
-const has=l=>l.some(x=>x.uid===uid);
-
-/* Role & Permission Helpers */
-const reqRole=()=>{const m=(S.members||{})[uid];if(!m)return"";return m.status==="done"?(m.want||"student"):"student"};
-const grantedRole=()=>((S.roles||{})[uid]||{}).role||"";
-const role=()=>{if(canEdit)return"admin";const g=grantedRole();if(g)return g;const r=reqRole();return r||"student"};
-const LABEL={student:"Student",officer:"Officer",adviser:"Adviser or faculty",staff:"Staff",other:"Other"},WL={...LABEL,admin:"Admin"};
-const roleLabel=()=>{
-  if(isAdmin())return"Admin";
-  const g=(S.roles||{})[uid];if(g)return g.label||LABEL[g.role]||"Officer";
-  const m=(S.members||{})[uid];
-  if(m&&m.status==="done"&&m.want&&m.want!=="student")return m.want==="other"?(m.other||"Other"):WL[m.want];
-  return"Student";
-};
-const isAdmin=()=>role()==="admin";
-
-/* Users (Officers, Advisers, Staff, Admin) can post events */
-const canPost=()=>role()!=="student";
-const canManage=e=>isAdmin()||(canPost()&&e.owner===uid);
-
-/* Strictly restrict approval authority to Admin */
-const canReview=()=>isAdmin();
-const auto=()=>isAdmin();
-
-const stOf=e=>e.status||"approved";
-const ROLETXT={student:"Your role: Student. You can browse events and RSVP.",officer:"Your role: Officer. You can submit events for Admin approval.",adviser:"Your role: Adviser / Faculty. You can submit events for Admin approval.",staff:"Your role: Staff. You can submit events for Admin approval.",admin:"Your role: Admin. You have full authority over event approvals, member role requests, and site administration."};
-const addBtn=d=>canPost()?`<br><br><button class="b sm" type="button" data-a="new"${d?` data-d="${d}"`:""}>Add an event${d?" on this day":""}</button>`:"";
-
-/* actions */
-async function doRsvp(id){
-  const e=EV().find(x=>x.id===id),full=e.going.length>=e.cap;
-  await putR({id:id+"_"+uid,event:id,uid,name:myName,at:Date.now(),course:prof.course||"",year:prof.year||""});
-  toast(full?"Event is full. You're on the waitlist.":"You're going to "+e.title+".");
-}
-function rsvp(id){if(!uid){toast("Sign in to RSVP.");return}if(!myName){pending=id;$("#nname").value="";$("#nd").showModal();return}doRsvp(id)}
-function leave(id){dropR(id+"_"+uid);toast("RSVP cancelled.")}
-function del(id){
-  const e=S.events.find(x=>x.id===id),rs=S.rs.filter(x=>x.event===id);
-  rs.forEach(r=>dropR(r.id));dropE(id);
-  toast('Deleted "'+e.title+'".',()=>{putE(e);rs.forEach(putR)});
-}
-function act(ev){
-  const b=ev.target.closest("[data-a]");if(!b)return;
-  const a=b.dataset.a,id=b.dataset.id;
-  if(a==="rsvp")rsvp(id);else if(a==="leave")leave(id);else if(a==="del")del(id);else if(a==="edit")openForm(id);else if(a==="new")openForm(null,b.dataset.d);else if(a==="approve")review(id,"approved");else if(a==="reject")openReject(id);
-}
-
-/* render */
-function card(e){
-  const mine=has(e.going),wl=has(e.wait),full=e.going.length>=e.cap,left=e.cap-e.going.length;
-  const stt=e.status||"approved",btn0=mine||wl?`<button class="b alt sm" data-a="leave" data-id="${e.id}">${mine?"Cancel RSVP":"Leave waitlist"}</button>`:`<button class="b sm" data-a="rsvp" data-id="${e.id}">${full?"Join waitlist":"RSVP"}</button>`;
-  const btn=stt!=="approved"?(stt==="pending"&&canReview()?`<button class="b sm" data-a="approve" data-id="${e.id}">Approve</button><button class="b alt sm" data-a="reject" data-id="${e.id}">Reject</button>`:""):btn0;
-  const mg=canManage(e)?`<span><button class="x" data-a="edit" data-id="${e.id}">Edit</button><button class="x" data-a="del" data-id="${e.id}">Delete</button></span>`:"";
-  return `<article class="ev" style="--c:var(--c-${e.cat})">
-    <div class="dt"><b>${D(e.date).getDate()}</b><span>${D(e.date).toLocaleDateString(undefined,{month:"short"})}</span></div>
-    <div><h3>${esc(e.title)}</h3>
-      <div class="meta">${esc(e.club)} &middot; <span class="cat">${e.cat}</span><br>${fmtTime(e.start)} to ${fmtTime(e.end)} at ${esc(e.venue)}</div>
-      <div class="bar" role="img" aria-label="${e.going.length} of ${e.cap} spots filled"><i style="width:${Math.min(100,e.going.length/e.cap*100)}%"></i></div>
-      <div class="cnt">${full?"Full":left+" of "+e.cap+" spots left"}${e.wait.length?`, ${e.wait.length} on waitlist`:""}</div>${stt==="rejected"&&e.note?`<div class="cnt">Reason: ${esc(e.note)}</div>`:""}</div>
-    <div class="act">${stt==="pending"?'<span class="status w">Pending approval</span>':""}${stt==="rejected"?'<span class="status w">Not approved</span>':""}${mine?`<span class="status">You're going</span>`:""}${wl?`<span class="status w">Waitlist #${e.wait.findIndex(x=>x.uid===uid)+1}</span>`:""}${btn}${mg}</div>
-  </article>`;
-}
-function render(){
-  const all=EV();
-  // Public listing displays only approved events
-  const vis=all.filter(e=>stOf(e)==="approved");
-  renderEvents(vis);
-  renderCal(vis);
-  renderDash(vis);
-  renderApprovals(all);
-  renderProfile(all);
-  renderContacts();
-  renderMembers();
-  applyRole();
-}
-function renderEvents(ev){
-  const up=ev.filter(e=>e.date>=iso(0)),going=ev.filter(e=>has(e.going)).length,open=ev.reduce((n,e)=>n+Math.max(0,e.cap-e.going.length),0);
-  $("#stats").innerHTML=`<span><b>${up.length}</b> upcoming</span><span><b>${going}</b> you're going to</span><span><b>${open}</b> open seats</span><span>${db?"Shared with everyone who opens this page":"Saved on this device only"}</span>`;
-  $("#chips").innerHTML=["All",...CATS].map(c=>`<button class="chip" type="button" aria-pressed="${c===filter}" data-c="${c}">${c==="All"?"":`<i style="--c:var(--c-${c})"></i>`}${c}</button>`).join("");
-  $("#mine").setAttribute("aria-pressed",mineOnly);
-  const q=query.toLowerCase();
-  const list=ev.filter(e=>(filter==="All"||e.cat===filter)&&(!mineOnly||has(e.going)||has(e.wait))&&(!q||(e.title+e.club+e.venue).toLowerCase().includes(q))).sort((a,b)=>(a.date+a.start).localeCompare(b.date+b.start));
-  if(!list.length){$("#list").innerHTML=`<div class="empty">${ev.length?"No events match these filters.":"No events yet."}${addBtn()}</div>`;return}
-  let html="",day="";
-  for(const e of list){if(e.date!==day){day=e.date;html+=`<h2>${dayLabel(day)}</h2>`}html+=card(e)}
-  $("#list").innerHTML=html;
-}
-function renderCal(ev){
-  const y=calM.getFullYear(),m=calM.getMonth(),first=new Date(y,m,1).getDay(),n=new Date(y,m+1,0).getDate();
-  const key=d=>y+"-"+String(m+1).padStart(2,"0")+"-"+String(d).padStart(2,"0");
-  let cells="";
-  for(let i=0;i<first;i++)cells+="<div></div>";
-  for(let d=1;d<=n;d++){
-    const k=key(d),l=ev.filter(e=>e.date===k).sort((a,b)=>a.start.localeCompare(b.start));
-    cells+=`<button type="button" class="cd${k===iso(0)?" today":""}" data-d="${k}" aria-pressed="${k===sel}" aria-label="${D(k).toLocaleDateString(undefined,{month:"long",day:"numeric"})}, ${l.length} events"><b>${d}</b>${l.slice(0,2).map(e=>`<span class="ce" style="--c:var(--c-${e.cat})">${esc(e.title)}</span>`).join("")}${l.length>2?`<span class="more">+${l.length-2} more</span>`:""}<span class="mk">${l.map(e=>`<i style="--c:var(--c-${e.cat})"></i>`).join("")}</span></button>`;
-  }
-  const day=sel?ev.filter(e=>e.date===sel).sort((a,b)=>a.start.localeCompare(b.start)):[];
-  $("#cal").innerHTML=`<div class="calh"><button class="icon" data-m="-1" aria-label="Previous month">&lsaquo;</button><h2>${calM.toLocaleDateString(undefined,{month:"long",year:"numeric"})}</h2><button class="b alt sm" data-m="0">Today</button><button class="icon" data-m="1" aria-label="Next month">&rsaquo;</button></div>
-  <div class="cg">${["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].map(w=>`<div class="cw">${w}</div>`).join("")}${cells}</div>
-  ${sel?`<h2>${dayLabel(sel)}</h2>${day.length?day.map(card).join(""):`<div class="empty">Nothing scheduled.${addBtn(sel)}</div>`}`:'<p class="pnote" style="margin-top:14px">Select a day to see its events.</p>'}`;
-}
-
-/* dashboard */
-const hrs=e=>{const[a,b]=e.start.split(":").map(Number),[c,d]=e.end.split(":").map(Number);return(c*60+d-a*60-b)/60};
-const rows=(r,m)=>{m=m||Math.max(1,...r.map(x=>x.v));return r.map(x=>`<div class="br"><span title="${esc(x.l)}">${esc(x.l)}</span><div class="bt"><i style="width:${Math.min(100,x.v/m*100)}%;background:${x.c||"var(--accent)"}"></i></div><b>${x.t}</b></div>`).join("")};
-function renderDash(all){
-  const ev=all.filter(e=>e.date>=iso(0));
-  if(!ev.length){$("#dash").innerHTML='<div class="empty">No upcoming events to report on yet.<br><br><button class="b sm" type="button" data-a="new">Add an event</button></div>';return}
-  const seats=ev.reduce((n,e)=>n+e.cap,0),going=ev.reduce((n,e)=>n+e.going.length,0),wait=ev.reduce((n,e)=>n+e.wait.length,0);
-  const rate=seats?Math.round(going/seats*100):0;
-  const cat=CATS.map(c=>{const l=ev.filter(e=>e.cat===c);return{l:c,v:l.reduce((n,e)=>n+e.going.length,0),t:l.length+(l.length===1?" event":" events"),c:`var(--c-${c})`}});
-  const ven=VENUES.map(v=>{const h=ev.filter(e=>e.venue===v).reduce((n,e)=>n+hrs(e),0);return{l:v,v:h,t:h.toFixed(1)+" h"}});
-  const days=[...Array(7)].map((_,i)=>{const d=iso(i),l=ev.filter(e=>e.date===d);return{d,k:l.length,n:l.reduce((n,e)=>n+e.going.length,0)}});
-  const dm=Math.max(1,...days.map(x=>x.n));
-  const fill=[...ev].sort((a,b)=>b.going.length/b.cap-a.going.length/a.cap).map(e=>({l:e.title,v:e.going.length/e.cap*100,t:e.going.length+"/"+e.cap,c:`var(--c-${e.cat})`}));
-  const pc={};ev.forEach(e=>e.going.forEach(r=>{const k=r.course||"Not set";pc[k]=(pc[k]||0)+1}));
-  const prog=Object.entries(pc).sort((a,b)=>b[1]-a[1]).slice(0,6).map(([l,v])=>({l,v,t:String(v)}));
-  const notes=[];
-  ev.forEach(e=>{
-    if(e.going.length>=e.cap&&e.wait.length)notes.push(`${esc(e.title)} is full with ${e.wait.length} waiting. Consider a larger venue or more capacity.`);
-    else if(e.date<=iso(3)&&e.going.length/e.cap<.2)notes.push(`${esc(e.title)} is ${dayLabel(e.date).toLowerCase()} and only ${Math.round(e.going.length/e.cap*100)}% filled. Worth promoting.`);
-  });
-  $("#dash").innerHTML=`
-  <div class="kpis"><div class="kpi"><b>${ev.length}</b><span>Upcoming events</span></div><div class="kpi"><b>${going}</b><span>Students going</span></div><div class="kpi"><b>${rate}%</b><span>Seats filled</span></div><div class="kpi"><b>${wait}</b><span>On waitlists</span></div></div>
-  <div class="panels">
-    <div class="panel wide"><h2>RSVPs over the next 7 days</h2><div class="cols">${days.map(x=>`<div class="col"><b>${x.n}</b><i style="height:${Math.round(x.n/dm*100)+4}px" title="${x.k} events"></i><span>${D(x.d).toLocaleDateString(undefined,{weekday:"short"})}<br>${D(x.d).getDate()}</span></div>`).join("")}</div></div>
-    <div class="panel"><h2>Students going by category</h2>${rows(cat)}</div>
-    <div class="panel"><h2>Venue hours booked</h2>${rows(ven)}</div>
-    <div class="panel"><h2>How full each event is</h2>${rows(fill,100)}</div>
-    <div class="panel"><h2>Who is going, by program</h2>${rows(prog)}</div>
-    <div class="panel"><h2>Needs attention</h2>${notes.length?notes.map(n=>`<div class="note">${n}</div>`).join(""):'<div class="note">Nothing needs attention right now.</div>'}</div>
-  </div>`;
-}
-
-/* views */
-let curView="events";
-const VIEWS={events:"#evview",cal:"#cal",dash:"#dash",profile:"#profile",about:"#about",contacts:"#contacts",members:"#members",approvals:"#approvals"};
-function setView(v){curView=v;for(const k in VIEWS)$(VIEWS[k]).hidden=k!==v;document.querySelectorAll(".tab").forEach(b=>b.setAttribute("aria-selected",b.dataset.v===v))}
-document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>setView(b.dataset.v));
-$("#list").addEventListener("click",act);
-$("#dash").addEventListener("click",act);
-$("#cal").addEventListener("click",e=>{
-  const m=e.target.closest("[data-m]"),d=e.target.closest("[data-d]");
-  if(m){const k=+m.dataset.m;if(k===0){calM=new Date();calM.setDate(1);sel=iso(0)}else calM=new Date(calM.getFullYear(),calM.getMonth()+k,1);render();return}
-  if(d&&!d.dataset.a){sel=sel===d.dataset.d?null:d.dataset.d;render();return}
-  act(e);
-});
-$("#me").value=myName;
-$("#me").addEventListener("input",e=>{myName=e.target.value.trim();try{localStorage.setItem(NKEY,myName)}catch(x){}});
-$("#q").addEventListener("input",e=>{query=e.target.value;render()});
-$("#mine").onclick=()=>{mineOnly=!mineOnly;render()};
-$("#chips").addEventListener("click",e=>{const b=e.target.closest("[data-c]");if(b){filter=b.dataset.c;render()}});
-$("#nf").addEventListener("submit",()=>{myName=$("#nname").value.trim();$("#me").value=myName;try{localStorage.setItem(NKEY,myName)}catch(x){}if(pending){const id=pending;pending=null;doRsvp(id)}});
-$("#ncancel").onclick=()=>$("#nd").close();
-
-/* event form (new and edit) */
-const f=$("#f");
-f.cat.innerHTML=CATS.map(c=>`<option>${c}</option>`).join("");
-f.venue.innerHTML=VENUES.map(v=>`<option>${v}</option>`).join("");
-const clashOf=d=>S.events.find(e=>e.id!==editing&&stOf(e)!=="rejected"&&e.venue===d.venue&&e.date===d.date&&d.start<e.end&&e.start<d.end);
-function hint(){
-  const d=Object.fromEntries(new FormData(f)),h=$("#hint");
-  const day=S.events.filter(e=>e.id!==editing&&stOf(e)!=="rejected"&&e.venue===d.venue&&e.date===d.date).sort((a,b)=>a.start.localeCompare(b.start));
-  const c=d.date&&d.start<d.end?clashOf(d):null;
-  h.className="hint"+(c?" bad":"");
-  h.textContent=c?`Conflict: "${c.title}" uses this venue ${fmtTime(c.start)} to ${fmtTime(c.end)}.`:day.length?`Already booked here that day: ${day.map(e=>fmtTime(e.start)+" to "+fmtTime(e.end)).join(", ")}.`:"This venue is free all day.";
-}
-function openForm(id,date){
-  if(!canPost())return;
-  editing=id||null;const e=id&&S.events.find(x=>x.id===id);
-  $("#ftitle").textContent=e?"Edit event":"New event";$("#fsub").textContent=auto()?(e?"Save changes":"Add event"):"Submit for Admin approval";
-  if(e){for(const k of["title","club","cat","venue","date","start","end","cap"])f[k].value=e[k];f.date.removeAttribute("min")}
-  else{f.title.value="";f.club.value="";f.cap.value=30;f.start.value="17:00";f.end.value="19:00";f.date.min=iso(0);f.date.value=date||sel||iso(1)}
-  $("#err").textContent="";hint();$("#dlg").showModal();f.title.focus();
-}
-f.addEventListener("input",hint);
-$("#new").onclick=()=>openForm();
-$("#cancel").onclick=()=>$("#dlg").close();
-f.addEventListener("submit",ev=>{
-  const d=Object.fromEntries(new FormData(f));
-  if(d.end<=d.start){ev.preventDefault();$("#err").textContent="End time must be after the start time.";return}
-  const c=clashOf(d);
-  if(c){ev.preventDefault();$("#err").textContent=`${d.venue} is booked by "${c.title}" at that time. Pick another time or venue.`;return}
-  const old=editing&&S.events.find(x=>x.id===editing);
-  
-  putE({id:editing||"e"+Date.now().toString(36),title:d.title.trim(),club:d.club.trim(),cat:d.cat,venue:d.venue,date:d.date,start:d.start,end:d.end,cap:Math.max(1,+d.cap),owner:old?(old.owner||null):uid,status:auto()?"approved":"pending",note:""});
-  toast(auto()?(old?"Changes saved.":"Event published immediately."):"Submitted for approval. An Admin must approve your event before it appears publicly.");
-});
-
-/* profile, about, contacts */
-const PRKEY="club-events-profile";
-let prof={course:"",year:""};
-try{prof=JSON.parse(localStorage.getItem(PRKEY))||prof}catch(e){}
-const PROGS={"College of Engineering and Architecture":["Civil Engineering","Electrical Engineering","Electronics Engineering","Mechanical Engineering","Computer Engineering","Architecture"],"College of Computer Studies":["Information Technology","Computer Science","Information Systems","Library and Information Science"],"College of Arts and Sciences":["English Language Studies","Mathematics","Applied Mathematics","Development Communication","Public Administration","Human Services"],"College of Health Sciences":["Nursing","Midwifery"],"College of Tourism, Hospitality, and Business Management":["Office Administration","Hospitality Management","Entrepreneurship","Tourism Management","Business Administration (Financial Management)"],"College of Technological and Developmental Education":["Technical-Vocational Teacher Education","Special Needs Education","Physical Education","Culture and Arts Education"],"Buhi Campus":["Office Administration (Buhi)","Early Childhood Education (Buhi)"],"Graduate School":["Master of Engineering","Master in Information Technology","Master in Nursing Education"]};
-$("#pcourse").innerHTML='<option value="">Select your program</option>'+Object.entries(PROGS).map(([g,l])=>`<optgroup label="${g}">${l.map(p=>`<option>${p}</option>`).join("")}</optgroup>`).join("")+'<option value="__other">Other (type it in)</option>';
-const known=Object.values(PROGS).flat();
-if(prof.course&&known.includes(prof.course))$("#pcourse").value=prof.course;
-else if(prof.course){$("#pcourse").value="__other";$("#pother").value=prof.course;$("#potherl").hidden=false}
-$("#pyear").value=prof.year||"";
-const saveProf=()=>{const v=$("#pcourse").value;$("#potherl").hidden=v!=="__other";prof={course:v==="__other"?$("#pother").value.trim():v,year:$("#pyear").value};try{localStorage.setItem(PRKEY,JSON.stringify(prof))}catch(e){}};
-$("#pcourse").addEventListener("change",saveProf);$("#pother").addEventListener("input",saveProf);$("#pyear").addEventListener("change",saveProf);
-function ava(){const n=($("#me").value||"").trim().split(/\s+/).filter(Boolean);$("#ava").textContent=n.length?(n[0][0]+(n.length>1?n[n.length-1][0]:"")).toUpperCase():"?"}
-$("#me").addEventListener("input",ava);ava();
-$("#alogo").src=$(".logo img").src;
-function renderProfile(ev){
-  const mine=ev.filter(e=>e.date>=iso(0)&&(has(e.going)||has(e.wait))).sort((a,b)=>(a.date+a.start).localeCompare(b.date+b.start));
-  const org=ev.filter(e=>e.owner===uid).sort((a,b)=>(a.date+a.start).localeCompare(b.date+b.start));
-  $("#rolenote").textContent=roleNote();$("#pdyn").innerHTML=`<h2>Your RSVPs</h2>${mine.length?mine.map(card).join(""):'<div class="empty">You have not RSVPed to an upcoming event yet.</div>'}${canPost()?`<h2>Events you organize</h2>${org.length?org.map(card).join(""):'<div class="empty">Events you add will show up here.</div>'}`:""}`;
-}
-$("#pdyn").addEventListener("click",act);
-function renderContacts(){
-  const c=S.contact||{},r=[];
-  if(c.email)r.push(["Email",`<a href="mailto:${esc(c.email)}">${esc(c.email)}</a>`]);
-  if(c.phone)r.push(["Phone",`<a href="tel:${esc(c.phone.replace(/[^+\d]/g,""))}">${esc(c.phone)}</a>`]);
-  if(c.hours)r.push(["Office hours",esc(c.hours)]);
-  $("#cdyn").innerHTML=`<h2>${esc(c.office||"Student events office")}</h2>${r.length?r.map(x=>`<div class="kv"><span>${x[0]}</span><span>${x[1]}</span></div>`).join(""):'<p class="pnote">No contact details added yet.</p>'}${canEdit?'<button class="b alt sm" type="button" id="cedit">Edit contact details</button>':""}`;
-}
-async function putC(c){S.contact=c;if(db){try{await db.doc("settings/contact").set(c)}catch(x){fail(x)}}else saveLocal();render()}
-$("#contacts").addEventListener("click",e=>{
-  if(e.target.id!=="cedit")return;
-  const c=S.contact||{};$("#cof").value=c.office||"";$("#cem").value=c.email||"";$("#cph").value=c.phone||"";$("#chr").value=c.hours||"";$("#cdlg").showModal();
-});
-$("#ccancel").onclick=()=>$("#cdlg").close();
-$("#cf").addEventListener("submit",()=>{putC({office:$("#cof").value.trim(),email:$("#cem").value.trim(),phone:$("#cph").value.trim(),hours:$("#chr").value.trim()});toast("Contact details saved.")});
-
-/* Tab Visibility and Role Authorization */
-function applyRole(){
-  $("#new").hidden=!canPost();
-  document.querySelector('[data-v="dash"]').hidden=!canPost();
-  
-  // Strictly hide Members and Approvals tabs from non-Admins
-  document.querySelector('[data-v="members"]').hidden=!isAdmin();
-  document.querySelector('[data-v="approvals"]').hidden=!canReview();
-  
-  const hideCurrent=(curView==="dash"&&!canPost())||(curView==="members"&&!isAdmin())||(curView==="approvals"&&!canReview());
-  if(hideCurrent)setView("events");
-}
-function renderMembers(){
-  if(!isAdmin()){$("#mdyn").innerHTML="";return}
-  const M=S.members||{},R=S.roles||{},all=Object.entries(M).map(([id,m])=>({id,...m}));
-  S.rs.forEach(r=>{if(r.uid&&!all.some(x=>x.id===r.uid))all.push({id:r.uid,name:r.name,course:r.course,year:r.year})});
-  Object.keys(R).forEach(id=>{if(!all.some(x=>x.id===id))all.push({id,name:R[id].name})});
-  const sub=x=>esc([x.course,x.year].filter(Boolean).join(" \u00b7 ")||"No program set");
-  const pend=all.filter(x=>x.status==="pending"&&x.id!==uid&&x.want&&x.want!=="student"&&!R[x.id]);
-  const rest=all.filter(x=>!pend.includes(x)).sort((a,b)=>(a.name||"").localeCompare(b.name||""));
-  const ph=pend.map(x=>{const w=x.want==="other"?(x.other||"Other"):WL[x.want],adm=x.want==="admin";
-    return `<div class="mrow"><div><b>${esc(x.name||"Unnamed")}</b><div class="pnote">${sub(x)}</div><div class="pnote">Requests: <b>${esc(w)}</b></div>${adm?'<div class="pnote">Admin access comes from sharing. Invite them as an Editor, then dismiss this request.</div>':""}</div><div class="act2">${adm?"":`<button class="b sm" type="button" data-ap="yes" data-id="${esc(x.id)}">Approve</button>`}<button class="b alt sm" type="button" data-ap="no" data-id="${esc(x.id)}">${adm?"Dismiss":"Decline"}</button></div></div>`}).join("");
-  const rh=rest.map(x=>{const r=R[x.id]?R[x.id].role:"student";
-    return `<div class="mrow"><div><b>${esc(x.name||"Unnamed")}</b><div class="pnote">${sub(x)}</div></div>${x.id===uid?'<span class="status">You (Admin)</span>':`<select data-role="${esc(x.id)}" aria-label="Role for ${esc(x.name||"member")}">${["student","officer","adviser","staff"].map(k=>`<option value="${k}"${r===k?" selected":""}>${LABEL[k]}</option>`).join("")}${r==="other"?`<option value="other" selected>${esc(R[x.id].label||"Other")}</option>`:""}</select>`}</div>`}).join("");
-  $("#mdyn").innerHTML=(pend.length?`<h2>Role requests</h2>${ph}`:"")+(rest.length?`<h2>Members</h2>${rh}`:"")||'<p class="pnote">No members yet.</p>';
-}
-async function putM(rec,id){
-  id=id||uid;S.members[id]=rec;render();
-  if(db){try{await db.collection("members").doc(id).set(rec)}catch(x){fail(x);delete S.members[id];render()}}else saveLocal();
-}
-async function setRole(id,r,label){
-  const nm=(S.members[id]||S.rs.find(x=>x.uid===id)||{}).name||"";
-  const doc=r==="student"?null:{role:r,label:r==="other"?(label||"Other"):"",name:nm};
-  if(db){try{if(doc)await db.collection("roles").doc(id).set(doc);else await db.collection("roles").doc(id).delete()}catch(x){fail(x);return}}
-  else{if(doc)S.roles[id]=doc;else delete S.roles[id];saveLocal();render()}
-  toast(doc?"Role updated.":"Back to the student role.");
-}
-function clearPending(id){const m=S.members[id];if(m)putM({...m,status:"done"},id)}
-$("#members").addEventListener("click",e=>{
-  const b=e.target.closest("[data-ap]");if(!b)return;
-  const id=b.dataset.id,m=S.members[id]||{};
-  if(b.dataset.ap==="yes")setRole(id,m.want,m.other);
-  clearPending(id);
-});
-
-/* Session handling */
-const LOGIN_PAGE="login.html",SKEY="club-events-session",GKEY="club-events-signup";
-function logout(){
-  try{localStorage.setItem(SKEY,"out");localStorage.removeItem(NKEY);localStorage.removeItem(PRKEY);localStorage.removeItem("club-events-user")}catch(x){}
-  location.href=LOGIN_PAGE;
-}
-$("#logout").onclick=logout;$("#logout2").onclick=logout;
-$("#reg").onclick=()=>{location.href=LOGIN_PAGE+"?edit=1"};
-function syncSignup(){
-  let r=null;try{r=JSON.parse(localStorage.getItem(GKEY))}catch(e){}
-  if(!r||r.synced||!uid)return;
-  const keep=S.members[uid]||{};
-  const status=r.want==="student"||(keep.want===r.want&&keep.status==="done")?"done":"pending";
-  putM({name:r.name,course:r.course,year:r.year,want:r.want,other:r.other||"",status,at:r.at});
-  r.synced=true;try{localStorage.setItem(GKEY,JSON.stringify(r))}catch(e){}
-}
-function roleNote(){
-  const m=S.members[uid],w=m&&(m.want==="other"?(m.other||"Other"):WL[m.want]);
-  const pend=m&&m.status==="pending"&&role()==="student"&&!canEdit?" Your request for the "+w+" role is waiting for approval.":"";
-  return ROLETXT[role()].replace(/^Your role: \w+\./,"Your role: "+roleLabel()+".")+(!isAdmin()&&canPost()?" New events require Admin approval before being published.":"")+(isAdmin()?" You have approval authority over event and member requests.":"")+pend;
-}
-$("#members").addEventListener("change",e=>{const id=e.target.dataset.role;if(id)setRole(id,e.target.value)});
-
-/* Approvals Tab View (Admin restricted) */
-function renderApprovals(all){
-  const q=all.filter(e=>stOf(e)==="pending").sort((a,b)=>(a.date+a.start).localeCompare(b.date+b.start));
-  document.querySelector('[data-v="approvals"]').textContent="Approvals"+(canReview()&&q.length?" ("+q.length+")":"");
-  if(!canReview()){$("#adyn").innerHTML="";return}
-  $("#adyn").innerHTML=`<div class="panel"><h2>Events waiting for Admin approval</h2><p class="pnote">Only admin-approved events appear publicly to students. Organizers see their own pending/rejected events on their profile.</p></div>`+(q.length?q.map(card).join(""):'<div class="empty">Nothing is waiting for Admin approval.</div>');
-}
-function review(id,status,note){
-  if(!canReview()){toast("Unauthorized: Only Admins can approve or reject events.");return}
-  const e=S.events.find(x=>x.id===id);if(!e)return;
-  putE({...e,status,note:note||"",reviewer:myName||roleLabel(),reviewedAt:Date.now()});
-  toast(status==="approved"?"Event approved and published.":"Event rejected.");
-}
-let rejId=null;
-function openReject(id){rejId=id;$("#rnote").value="";$("#rdlg").showModal()}
-$("#rf").addEventListener("submit",()=>review(rejId,"rejected",$("#rnote").value.trim()));
-$("#rcancel").onclick=()=>$("#rdlg").close();
-$("#adyn").addEventListener("click",act);
-render();initData();
-</script>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
 </body>
 </html>

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - CSPC Events Desk</title>
+    <link rel="stylesheet" href="/css/index.css">
+</head>
+<body>
+    <header class="navbar">
+        <div class="logo">
+            <img src="/images/cspc-seal.png" alt="CSPC Seal">
+            <h2>CSPC Events Desk</h2>
+        </div>
+        <nav>
+            <a href="/">Home</a>
+            <span class="nav-user">Hello, <%= user.firstName %> <%= user.lastName %></span>
+            <form action="/logout" method="POST" class="nav-logout-form">
+                <button type="submit" class="nav-button">Logout</button>
+            </form>
+        </nav>
+    </header>
+
+    <main class="hero">
+        <div class="hero-content">
+            <p class="eyebrow">CSPC EVENTS DESK</p>
+            <h1>Welcome to your <span>Dashboard</span></h1>
+            <p class="hero-description">Hello, <%= user.firstName %>! Your personal dashboard is ready. More features can be added later.</p>
+            <div class="hero-buttons">
+                <a href="/" class="primary-button">Back to Home</a>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

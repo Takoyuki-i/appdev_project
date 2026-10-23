@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -28,8 +27,15 @@
         <nav>
             <a href="/">Home</a>
             <a href="#calendar">Calendar</a>
-            <a href="/login">Login</a>
-            <a href="/register" class="nav-button">Sign Up</a>
+            <% if (user) { %>
+                <span class="nav-user">Hello, <a href="/dashboard"><%= user.firstName %> <%= user.lastName %></a></span>
+                <form action="/logout" method="POST" class="nav-logout-form">
+                    <button type="submit" class="nav-button">Logout</button>
+                </form>
+            <% } else { %>
+                <a href="/login">Login</a>
+                <a href="/register" class="nav-button">Sign Up</a>
+            <% } %>
         </nav>
     </header>
 
@@ -55,9 +61,11 @@
                     Explore Events
                 </a>
 
-                <a href="/register" class="secondary-button">
-                    Get Started
-                </a>
+                <% if (user) { %>
+                    <a href="#calendar" class="secondary-button">View Calendar</a>
+                <% } else { %>
+                    <a href="/register" class="secondary-button">Get Started</a>
+                <% } %>
             </div>
         </div>
     </section>
@@ -216,4 +224,3 @@
 
 </body>
 </html>
-```
