@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 24, 2026 at 01:58 AM
+-- Generation Time: Oct 24, 2026 at 02:03 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -116,7 +116,7 @@ CREATE TABLE `events` (
   `eventScope` varchar(20) NOT NULL,
   `departmentId` int(11) DEFAULT NULL,
   `createdAt` datetime NOT NULL DEFAULT current_timestamp(),
-  `approvalStatus` enum('pending','approved','rejected') NOT NULL DEFAULT 'pending',
+  `approvalStatus` enum('pending','approved','rejected','cancelled') NOT NULL DEFAULT 'pending',
   `duration` int(11) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
