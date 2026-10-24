@@ -11,8 +11,6 @@
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
 
 
-/* CSPC Events Desk visual theme — theme-only overrides.
-   Layout, page content, API calls, and admin actions remain unchanged. */
 body {
   background:
     radial-gradient(ellipse at 4% 0%, rgba(62, 93, 165, .32), transparent 38%),

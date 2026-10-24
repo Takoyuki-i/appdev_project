@@ -1,20 +1,4 @@
 'use strict';
-
-/*
- * Admin dashboard frontend only.
- * Expected Express endpoints:
- *   GET  /api/admin/event-proposals?status=pending|approved|rejected|all
- *        -> { events: [{ id, title, description, organizerName, category, venue,
- *                       eventDate, startTime, endTime, status, submittedAt,
- *                       reviewNote }] }
- *   POST /api/admin/event-proposals/:id/decision
- *        JSON body: { status: "approved" | "rejected", reviewNote: "..." }
- *        -> { success: true, event: { ... } }
- *   GET  /api/events -> FullCalendar-compatible array of APPROVED events only
- *
- * The server must authenticate the session and verify the admin role for the
- * admin endpoints. Do not use localStorage or client-side role flags as security.
- */
 (() => {
   const $ = (selector) => document.querySelector(selector);
   const state = { status: 'pending', events: [], activeEvent: null, decision: null, calendar: null };
@@ -214,7 +198,6 @@
       ? `“${getTitle(event)}” will be cancelled and removed from the public calendar. This action cannot be undone through this dashboard.`
       : `“${getTitle(event)}” will be declined and will not appear on the public calendar.`;
 
-  // The reason field is used only when declining a proposal.
   els.reasonLabel.hidden = approve || cancel;
   els.reason.hidden = approve || cancel;
 
