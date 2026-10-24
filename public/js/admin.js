@@ -69,9 +69,9 @@
     const type = response.headers.get('content-type') || '';
     const body = type.includes('application/json') ? await response.json() : null;
     if (response.status === 401 || response.status === 403) {
-      throw new Error(body?.message || 'Your session may have expired or you do not have admin permission. Please sign in again.');
+      throw new Error(body?.error || body?.message || 'Your session may have expired or you do not have admin permission. Please sign in again.');
     }
-    if (!response.ok) throw new Error(body?.message || `Request failed (${response.status}).`);
+    if (!response.ok) throw new Error(body?.error || body?.message || `Request failed (${response.status}).`);
     if (!body) throw new Error('The server did not return JSON. Check that the requested Express API route exists.');
     return body;
   }
@@ -118,6 +118,8 @@
       const status = normalizedStatus(event);
       const date = dateLabel(getDate(event));
       const time = getTime(event);
+      const duration = Number.parseInt(event.duration, 10);
+      const durationLabel = Number.isInteger(duration) && duration > 0 ? `${duration} day${duration === 1 ? '' : 's'}` : '';
       const description = event.description || event.details || event.purpose || '';
       const category = event.category || event.cat || 'Uncategorized';
       const venue = event.venue || 'Venue not specified';
@@ -132,7 +134,7 @@
           <div class="proposal-topline"><span class="status-badge ${status}">${safe(statusText(status))}</span><h3>${safe(getTitle(event))}</h3></div>
           ${description ? `<p class="proposal-description">${safe(description)}</p>` : '<p class="proposal-description">No description was provided.</p>'}
           <div class="proposal-meta">
-            <span>◷ <b>${safe(date)}${time ? ` · ${safe(time)}` : ''}</b></span>
+            <span>◷ <b>${safe(date)}${time ? ` · ${safe(time)}` : ''}${durationLabel ? ` · ${safe(durationLabel)}` : ''}</b></span>
             <span>⌖ <b>${safe(venue)}</b></span>
             <span>▤ <b>${safe(category)}</b></span>
             <span>♙ <b>${safe(getOrganizer(event))}</b></span>

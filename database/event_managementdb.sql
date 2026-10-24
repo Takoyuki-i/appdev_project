@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 22, 2026 at 11:11 PM
+-- Generation Time: Oct 24, 2026 at 01:58 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -31,11 +31,35 @@ CREATE TABLE `accounts` (
   `accountId` int(11) NOT NULL,
   `firstName` varchar(50) NOT NULL,
   `lastName` varchar(50) NOT NULL,
-  `username` varchar(50) NOT NULL,
   `passwordHash` varchar(255) NOT NULL,
-  `email` varchar(100) NOT NULL,
-  `accountStatus` varchar(20) NOT NULL DEFAULT 'active'
+  `email` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `accounts`
+--
+
+INSERT INTO `accounts` (`accountId`, `firstName`, `lastName`, `passwordHash`, `email`) VALUES
+(1, 'Gabriel', 'Estadilla', '$2b$10$hSYKjieH.GxXluus1uGsveTRNP6V5cITs5jcC673QJ4HBkPtoL0MK', 'sample@gmail.com');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `admin`
+--
+
+CREATE TABLE `admin` (
+  `adminID` int(11) NOT NULL,
+  `adminnumber` varchar(50) NOT NULL,
+  `adminpasswordHash` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `admin`
+--
+
+INSERT INTO `admin` (`adminID`, `adminnumber`, `adminpasswordHash`) VALUES
+(1, '0001', '$2b$10$sCjGUm3ZgAlSImZJHI/AluOQ8ZEdGULCBcGSfHe267nwFMKNyiB/S');
 
 -- --------------------------------------------------------
 
@@ -91,8 +115,18 @@ CREATE TABLE `events` (
   `venueId` int(11) NOT NULL,
   `eventScope` varchar(20) NOT NULL,
   `departmentId` int(11) DEFAULT NULL,
-  `createdAt` datetime NOT NULL DEFAULT current_timestamp()
-) ;
+  `createdAt` datetime NOT NULL DEFAULT current_timestamp(),
+  `approvalStatus` enum('pending','approved','rejected') NOT NULL DEFAULT 'pending',
+  `duration` int(11) NOT NULL DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `events`
+--
+
+INSERT INTO `events` (`eventId`, `eventName`, `description`, `headId`, `coHeadId`, `organizers`, `eventDate`, `startTime`, `endTime`, `venueId`, `eventScope`, `departmentId`, `createdAt`, `approvalStatus`, `duration`) VALUES
+(1, 'Test Event', 'Testing events', 1, NULL, NULL, '2026-10-24', '08:30:00', '17:00:00', 2, 'Campus-wide', NULL, '2026-10-24 07:32:18', 'approved', 2),
+(2, 'Test Department', 'Department Test', 1, NULL, NULL, '2026-10-24', '10:30:00', '14:30:00', 1, 'Department-specific', 1, '2026-10-24 07:48:05', 'approved', 2);
 
 -- --------------------------------------------------------
 
@@ -123,8 +157,14 @@ INSERT INTO `venues` (`venueId`, `venueName`, `venueStatus`) VALUES
 --
 ALTER TABLE `accounts`
   ADD PRIMARY KEY (`accountId`),
-  ADD UNIQUE KEY `username` (`username`),
   ADD UNIQUE KEY `email` (`email`);
+
+--
+-- Indexes for table `admin`
+--
+ALTER TABLE `admin`
+  ADD PRIMARY KEY (`adminID`),
+  ADD UNIQUE KEY `adminnumber` (`adminnumber`);
 
 --
 -- Indexes for table `departments`
@@ -163,7 +203,13 @@ ALTER TABLE `venues`
 -- AUTO_INCREMENT for table `accounts`
 --
 ALTER TABLE `accounts`
-  MODIFY `accountId` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `accountId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `admin`
+--
+ALTER TABLE `admin`
+  MODIFY `adminID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `departments`
@@ -181,7 +227,7 @@ ALTER TABLE `eventorganizer`
 -- AUTO_INCREMENT for table `events`
 --
 ALTER TABLE `events`
-  MODIFY `eventId` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `eventId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `venues`

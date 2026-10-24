@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit Event Proposal - CSPC Events Desk</title>
+    <link rel="stylesheet" href="/css/index.css">
+    <style>
+        .proposal-wrap { width: min(820px, 92%); margin: 38px auto 64px; }
+        .proposal-card { background: #fff; border: 1px solid #dfe7ee; border-radius: 16px; padding: 30px; box-shadow: 0 5px 20px rgba(20,45,70,.06); }
+        .proposal-card h1 { margin-top: 0; color: #173d5b; }
+        .proposal-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 16px; }
+        .field { display: flex; flex-direction: column; gap: 7px; margin-bottom: 16px; color: #30485c; font-weight: 600; }
+        .field input, .field select, .field textarea { width: 100%; box-sizing: border-box; padding: 11px 12px; border: 1px solid #bdcad6; border-radius: 8px; font: inherit; color: #172b3a; background: #fff; }
+        .field textarea { min-height: 120px; resize: vertical; }
+        .field small { font-weight: 400; color: #657687; }
+        .form-error { background: #fff0f0; color: #8b2424; border: 1px solid #f0caca; padding: 12px 14px; border-radius: 8px; margin-bottom: 18px; }
+        .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 8px; }
+        .btn { border: 0; border-radius: 8px; padding: 12px 18px; font: inherit; font-weight: 700; text-decoration: none; cursor: pointer; }
+        .btn-primary { background: #174f7d; color: white; }
+        .btn-secondary { background: #eef3f7; color: #174f7d; }
+        @media(max-width: 620px) { .proposal-card { padding: 20px; } .proposal-grid { grid-template-columns: 1fr; gap: 0; } }
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <div class="logo"><img src="/images/cspc-seal.png" alt="CSPC Seal"><h2>CSPC Events Desk</h2></div>
+        <nav><a href="/">Home</a><a href="/dashboard">Dashboard</a><span class="nav-user">Hello, <%= user.firstName %></span></nav>
+    </header>
+
+    <main class="proposal-wrap">
+        <section class="proposal-card">
+            <p class="eyebrow">EVENT MANAGEMENT</p>
+            <h1>Submit an Event Proposal</h1>
+            <p>Your proposal will remain pending until it is reviewed by an administrator.</p>
+
+            <% if (error) { %><div class="form-error" role="alert"><%= error %></div><% } %>
+
+            <form action="/events/new" method="POST">
+                <label class="field" for="eventName">Event name
+                    <input id="eventName" name="eventName" maxlength="100" required value="<%= formData.eventName || '' %>">
+                </label>
+
+                <label class="field" for="description">Description
+                    <textarea id="description" name="description" required><%= formData.description || '' %></textarea>
+                </label>
+
+                <div class="proposal-grid">
+                    <label class="field" for="eventDate">Start date
+                        <input id="eventDate" name="eventDate" type="date" required value="<%= formData.eventDate || '' %>">
+                    </label>
+                    <label class="field" for="duration">Duration (days)
+                        <input id="duration" name="duration" type="number" min="1" max="365" step="1" required value="<%= formData.duration || 1 %>">
+                        <small>For example, 3 means the event covers the start date and the following 2 days.</small>
+                    </label>
+                    <label class="field" for="startTime">Daily start time
+                        <input id="startTime" name="startTime" type="time" required value="<%= formData.startTime || '' %>">
+                    </label>
+                    <label class="field" for="endTime">Daily end time
+                        <input id="endTime" name="endTime" type="time" required value="<%= formData.endTime || '' %>">
+                    </label>
+                    <label class="field" for="venueId">Venue
+                        <select id="venueId" name="venueId" required>
+                            <option value="">Choose a venue</option>
+                            <% venues.forEach((venue) => { %>
+                                <option value="<%= venue.venueId %>" <%= String(formData.venueId || '') === String(venue.venueId) ? 'selected' : '' %>><%= venue.venueName %></option>
+                            <% }) %>
+                        </select>
+                        <small>The venue is reserved for the full duration of the event.</small>
+                    </label>
+                    <label class="field" for="coHeadId">Co-head (optional)
+                        <select id="coHeadId" name="coHeadId">
+                            <option value="">No co-head</option>
+                            <% accounts.forEach((account) => { %>
+                                <option value="<%= account.accountId %>" <%= String(formData.coHeadId || '') === String(account.accountId) ? 'selected' : '' %>><%= account.firstName %> <%= account.lastName %> — <%= account.email %></option>
+                            <% }) %>
+                        </select>
+                    </label>
+                    <label class="field" for="eventScope">Event scope
+                        <select id="eventScope" name="eventScope" required>
+                            <option value="Campus-wide" <%= !formData.eventScope || formData.eventScope === 'Campus-wide' ? 'selected' : '' %>>Campus-wide</option>
+                            <option value="Department-specific" <%= formData.eventScope === 'Department-specific' ? 'selected' : '' %>>Department-specific</option>
+                        </select>
+                        <small>Choose whether the event is for the whole campus or one department.</small>
+                    </label>
+                    <div id="departmentField" style="display: none;">
+                        <label class="field" for="departmentId">Department
+                            <select id="departmentId" name="departmentId">
+                                <option value="">Choose a department</option>
+                                <% departments.forEach((department) => { %>
+                                    <option value="<%= department.departmentId %>" <%= String(formData.departmentId || '') === String(department.departmentId) ? 'selected' : '' %>><%= department.departmentName %> (<%= department.departmentCode %>)</option>
+                                <% }) %>
+                            </select>
+                            <small>Required for department-specific events.</small>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button class="btn btn-primary" type="submit">Submit Proposal</button>
+                    <a class="btn btn-secondary" href="/dashboard">Cancel</a>
+                </div>
+            </form>
+        </section>
+    </main>
+
+    <script>
+        const eventScope = document.getElementById('eventScope');
+        const departmentField = document.getElementById('departmentField');
+        const departmentSelect = document.getElementById('departmentId');
+
+        function updateDepartmentField() {
+            const departmentSpecific = eventScope.value === 'Department-specific';
+            departmentField.style.display = departmentSpecific ? 'block' : 'none';
+            departmentSelect.required = departmentSpecific;
+            if (!departmentSpecific) departmentSelect.value = '';
+        }
+
+        eventScope.addEventListener('change', updateDepartmentField);
+        updateDepartmentField();
+    </script>
+</body>
+</html>

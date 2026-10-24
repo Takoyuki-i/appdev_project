@@ -1,0 +1,131 @@
+.dashboard-main {
+            width: min(1100px, 92%);
+            margin: 40px auto 64px;
+        }
+
+        .dashboard-welcome {
+            padding: 32px;
+            border-radius: 18px;
+            background: #f3f7fb;
+            margin-bottom: 28px;
+        }
+
+        .dashboard-welcome .eyebrow {
+            color: #285b87;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            font-size: 0.8rem;
+        }
+
+        .dashboard-welcome h1 {
+            margin: 8px 0 12px;
+        }
+
+        .dashboard-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 22px;
+        }
+
+        .dashboard-button {
+            display: inline-block;
+            border: 0;
+            border-radius: 8px;
+            padding: 12px 18px;
+            font: inherit;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .dashboard-button-primary {
+            background: #174f7d;
+            color: #fff;
+        }
+
+        .dashboard-button-secondary {
+            background: #fff;
+            color: #174f7d;
+            border: 1px solid #174f7d;
+        }
+
+        .dashboard-section {
+            margin-top: 30px;
+        }
+
+        .dashboard-section-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+
+        .dashboard-section-heading h2 {
+            margin: 0;
+        }
+
+        .event-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 18px;
+        }
+
+        .event-card {
+            background: #fff;
+            border: 1px solid #e1e7ed;
+            border-radius: 14px;
+            padding: 20px;
+            box-shadow: 0 4px 14px rgba(20, 45, 70, 0.06);
+        }
+
+        .event-card h3 {
+            margin: 0 0 10px;
+            color: #173d5b;
+        }
+
+        .event-meta {
+            margin: 7px 0;
+            color: #526170;
+            font-size: 0.95rem;
+        }
+
+        .event-description {
+            margin-top: 12px;
+            line-height: 1.5;
+            overflow-wrap: anywhere;
+        }
+
+        .event-status {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 5px 10px;
+            border-radius: 999px;
+            background: #e7f2ff;
+            color: #174f7d;
+            font-size: 0.82rem;
+            font-weight: 700;
+            text-transform: capitalize;
+        }
+
+        .empty-state {
+            padding: 28px;
+            text-align: center;
+            border: 1px dashed #b8c6d3;
+            border-radius: 14px;
+            background: #fbfdff;
+            color: #526170;
+        }
+
+        .empty-state h3 {
+            color: #173d5b;
+            margin-top: 0;
+        }
+
+        @media (max-width: 600px) {
+            .dashboard-welcome {
+                padding: 22px;
+            }
+        }

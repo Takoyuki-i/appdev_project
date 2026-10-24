@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - CSPC Events Desk</title>
     <link rel="stylesheet" href="/css/index.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
 </head>
 <body>
     <header class="navbar">
@@ -21,15 +22,60 @@
         </nav>
     </header>
 
-    <main class="hero">
-        <div class="hero-content">
+    <main class="dashboard-main">
+        <section class="dashboard-welcome">
             <p class="eyebrow">CSPC EVENTS DESK</p>
-            <h1>Welcome to your <span>Dashboard</span></h1>
-            <p class="hero-description">Hello, <%= user.firstName %>! Your personal dashboard is ready. More features can be added later.</p>
-            <div class="hero-buttons">
-                <a href="/" class="primary-button">Back to Home</a>
+            <h1>Welcome, <%= user.firstName %>!</h1>
+            <p>Manage your event proposals and keep track of your upcoming events here.</p>
+
+            <div class="dashboard-actions">
+                <a href="/events/new" class="dashboard-button dashboard-button-primary">＋ Submit an Event Proposal</a>
+                <a href="/" class="dashboard-button dashboard-button-secondary">View Public Calendar</a>
             </div>
-        </div>
+        </section>
+
+        <section class="dashboard-section">
+            <div class="dashboard-section-heading">
+                <h2>Your Upcoming Events</h2>
+            </div>
+
+            <% if (typeof upcomingEvents !== 'undefined' && upcomingEvents.length > 0) { %>
+                <div class="event-list">
+                    <% upcomingEvents.forEach((event) => { %>
+                        <article class="event-card">
+                            <h3><%= event.eventName %></h3>
+                            <p class="event-meta">
+                                <strong>Date:</strong>
+                                <%= event.eventDate ? new Date(event.eventDate + 'T00:00:00').toLocaleDateString('en-PH', { year: 'numeric', month: 'long', day: 'numeric' }) : 'Date not available' %>
+                                <% if (event.duration > 1) { %> – <%= new Date(event.lastDate + 'T00:00:00').toLocaleDateString('en-PH', { year: 'numeric', month: 'long', day: 'numeric' }) %> <% } %>
+                            </p>
+                            <p class="event-meta">
+                                <strong>Time:</strong>
+                                <%= event.startTime %> – <%= event.endTime %>
+                            </p>
+                            <% if (event.duration > 1) { %>
+                                <p class="event-meta"><strong>Duration:</strong> <%= event.duration %> days</p>
+                            <% } %>
+                            <% if (event.venueName) { %>
+                                <p class="event-meta"><strong>Venue:</strong> <%= event.venueName %></p>
+                            <% } %>
+                            <% if (event.approvalStatus) { %>
+                                <span class="event-status"><%= event.approvalStatus %></span>
+                            <% } %>
+                            <% if (event.description) { %>
+                                <p class="event-description"><%= event.description %></p>
+                            <% } %>
+                        </article>
+                    <% }) %>
+                </div>
+            <% } else { %>
+                <div class="empty-state">
+                    <h3>No upcoming events yet</h3>
+                    <p>When you submit an event proposal and it is approved, your upcoming events will appear here.</p>
+                    <a href="/events/new" class="dashboard-button dashboard-button-primary">Submit Your First Proposal</a>
+                </div>
+            <% } %>
+        </section>
     </main>
 </body>
 </html>

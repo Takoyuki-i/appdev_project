@@ -25,7 +25,6 @@
         <strong>Your role</strong>
         <p>Review and approve or reject event proposals. Approved events are published to the public calendar.</p>
       </div>
-      <a class="back-link" href="/">← Back to public website</a>
     </aside>
 
     <main class="main-area">
@@ -38,7 +37,9 @@
         <div class="top-actions">
           <span class="admin-pill"><span></span> Admin</span>
           <button class="icon-button" id="refresh-button" type="button" title="Refresh proposals" aria-label="Refresh proposals">↻</button>
-          <a class="logout-link" href="/logout">Log out</a>
+          <form action="/logout" method="POST" class="logout-form">
+            <button class="logout-link" type="submit">Log out</button>
+          </form>
         </div>
       </header>
 
