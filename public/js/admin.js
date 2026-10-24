@@ -32,7 +32,12 @@
   const safe = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
   }[char]));
-  const statusText = (status) => ({ pending: 'Pending review', approved: 'Approved', rejected: 'Declined' }[status] || 'Pending review');
+  const statusText = (status) => ({
+  pending: 'Pending review',
+  approved: 'Approved',
+  rejected: 'Declined',
+  cancelled: 'Cancelled'
+}[status] || 'Pending review');
   const dateLabel = (value) => {
     if (!value) return 'Date not provided';
     const date = new Date(`${String(value).slice(0, 10)}T00:00:00`);
@@ -46,10 +51,14 @@
     return d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
   };
   const normalizedStatus = (event) => {
-    const status = String(event.status || 'pending').toLowerCase();
-    if (status === 'declined') return 'rejected';
-    return ['pending', 'approved', 'rejected'].includes(status) ? status : 'pending';
-  };
+  const status = String(event.status || 'pending').toLowerCase();
+
+  if (status === 'declined') return 'rejected';
+
+  return ['pending', 'approved', 'rejected', 'cancelled'].includes(status)
+    ? status
+    : 'pending';
+};
   const getTitle = (event) => event.title || event.eventTitle || 'Untitled event';
   const getOrganizer = (event) => event.organizerName || event.organizer || event.club || 'Organizer not specified';
   const getDate = (event) => event.eventDate || event.date || event.start || '';
@@ -109,7 +118,8 @@
       const message = els.search.value.trim() ? 'Try another search term.' : ({
         pending: 'There are no event proposals waiting for review.',
         approved: 'No approved proposals were returned.',
-        rejected: 'No declined proposals were returned.'
+        rejected: 'No declined proposals were returned.',
+        cancelled: 'There are no cancelled events.'
       }[state.status]);
       els.proposalList.innerHTML = `<div class="empty-state"><span class="empty-icon">✓</span><strong>${els.search.value.trim() ? 'No matching proposals' : 'All caught up'}</strong><span>${safe(message)}</span></div>`;
       return;
@@ -126,8 +136,22 @@
       const submitted = event.submittedAt || event.createdAt || event.created_at;
       const submittedLabel = submitted ? dateLabel(String(submitted).slice(0, 10)) : '';
       const actions = status === 'pending'
-        ? `<button class="button approve" type="button" data-decision="approved" data-id="${safe(event.id)}">✓ Approve</button><button class="button decline" type="button" data-decision="rejected" data-id="${safe(event.id)}">× Decline</button>`
-        : `<span class="status-badge ${status}">${safe(statusText(status))}</span>`;
+  ? `<button class="button approve" type="button"
+       data-decision="approved" data-id="${safe(event.id)}">
+       ✓ Approve
+     </button>
+     <button class="button decline" type="button"
+       data-decision="rejected" data-id="${safe(event.id)}">
+       × Decline
+     </button>`
+  : status === 'approved'
+    ? `<button class="button decline" type="button"
+         data-decision="cancelled" data-id="${safe(event.id)}">
+         × Cancel Event
+       </button>`
+    : `<span class="status-badge ${status}">
+         ${safe(statusText(status))}
+       </span>`;
       const note = event.reviewNote || event.review_note || '';
       return `<article class="proposal-card">
         <div class="proposal-main">
@@ -161,24 +185,50 @@
   }
 
   function openDecision(id, status) {
-    const event = state.events.find((item) => String(item.id) === String(id));
-    if (!event) return;
-    state.activeEvent = event;
-    state.decision = status;
-    els.reason.value = '';
-    els.dialogError.textContent = '';
-    const approve = status === 'approved';
-    els.dialogMark.textContent = approve ? '✓' : '×';
-    els.dialogTitle.textContent = approve ? 'Approve this event?' : 'Decline this proposal?';
-    els.dialogDescription.textContent = approve
-      ? `“${getTitle(event)}” will become approved and can appear on the public calendar.`
+  const event = state.events.find(
+    (item) => String(item.id) === String(id)
+  );
+
+  if (!event) return;
+
+  state.activeEvent = event;
+  state.decision = status;
+
+  els.reason.value = '';
+  els.dialogError.textContent = '';
+
+  const approve = status === 'approved';
+  const cancel = status === 'cancelled';
+
+  els.dialogMark.textContent = approve ? '✓' : '×';
+
+  els.dialogTitle.textContent = approve
+    ? 'Approve this event?'
+    : cancel
+      ? 'Cancel this approved event?'
+      : 'Decline this proposal?';
+
+  els.dialogDescription.textContent = approve
+    ? `“${getTitle(event)}” will become approved and can appear on the public calendar.`
+    : cancel
+      ? `“${getTitle(event)}” will be cancelled and removed from the public calendar. This action cannot be undone through this dashboard.`
       : `“${getTitle(event)}” will be declined and will not appear on the public calendar.`;
-    els.reasonLabel.hidden = approve;
-    els.reason.hidden = approve;
-    els.confirm.textContent = approve ? 'Approve event' : 'Decline proposal';
-    els.confirm.className = `button ${approve ? 'primary' : 'decline'}`;
-    els.dialog.showModal();
-  }
+
+  // The reason field is used only when declining a proposal.
+  els.reasonLabel.hidden = approve || cancel;
+  els.reason.hidden = approve || cancel;
+
+  els.confirm.textContent = approve
+    ? 'Approve event'
+    : cancel
+      ? 'Cancel event'
+      : 'Decline proposal';
+
+  els.confirm.className =
+    `button ${approve ? 'primary' : 'decline'}`;
+
+  els.dialog.showModal();
+}
 
   async function submitDecision(event) {
     event.preventDefault();
@@ -193,14 +243,24 @@
         body: JSON.stringify({ status: state.decision, reviewNote: els.reason.value.trim() })
       });
       els.dialog.close();
-      toast(state.decision === 'approved' ? 'Event approved. It can now appear on the public calendar.' : 'Event proposal declined.');
+      toast(
+          state.decision === 'approved'
+          ? 'Event approved. It can now appear on the public calendar.'
+          : state.decision === 'cancelled'
+          ? 'Event cancelled and removed from the public calendar.'
+          : 'Event proposal declined.'
+        );
       await loadProposals();
       if (state.calendar) state.calendar.refetchEvents();
     } catch (error) {
       els.dialogError.textContent = error.message;
     } finally {
-      els.confirm.disabled = false;
-      els.confirm.textContent = state.decision === 'approved' ? 'Approve event' : 'Decline proposal';
+      els.confirm.textContent =
+  state.decision === 'approved'
+    ? 'Approve event'
+    : state.decision === 'cancelled'
+      ? 'Cancel event'
+      : 'Decline proposal';
     }
   }
 

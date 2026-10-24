@@ -347,7 +347,7 @@ app.get('/api/admin/event-proposals', (req, res) => {
         return res.status(401).json({ error: 'Admin login required.' });
     }
 
-    const allowedStatuses = ['pending', 'approved', 'rejected', 'all'];
+    const allowedStatuses = ['pending', 'approved', 'rejected', 'cancelled', 'all'];
     const requestedStatus = String(req.query.status || 'pending').toLowerCase();
     const status = allowedStatuses.includes(requestedStatus) ? requestedStatus : 'pending';
 
@@ -370,7 +370,7 @@ app.get('/api/admin/event-proposals', (req, res) => {
         INNER JOIN accounts AS head ON events.headId = head.accountId
         INNER JOIN venues ON events.venueId = venues.venueId
         WHERE (? = 'all' OR events.approvalStatus = ?)
-        ORDER BY FIELD(events.approvalStatus, 'pending', 'approved', 'rejected'), events.createdAt DESC
+        ORDER BY FIELD(events.approvalStatus, 'pending', 'approved', 'rejected', 'cancelled'), events.createdAt DESC
     `;
 
     db.query(sql, [status, status], (err, events) => {
@@ -383,56 +383,103 @@ app.get('/api/admin/event-proposals', (req, res) => {
 });
 
 // Admin API: approve or reject a submitted event proposal.
+
 app.post('/api/admin/event-proposals/:id/decision', (req, res) => {
     if (!req.session.admin) {
-        return res.status(401).json({ error: 'Admin login required.' });
+        return res.status(401).json({
+            error: 'Admin login required.'
+        });
     }
 
     const eventId = Number.parseInt(req.params.id, 10);
     const status = String(req.body.status || '').toLowerCase();
     const reviewNote = String(req.body.reviewNote || '').trim();
 
-    if (!Number.isInteger(eventId) || eventId < 1 || !['approved', 'rejected'].includes(status)) {
-        return res.status(400).json({ error: 'Invalid event ID or decision.' });
+    if (
+        !Number.isInteger(eventId) ||
+        eventId < 1 ||
+        !['approved', 'rejected', 'cancelled'].includes(status)
+    ) {
+        return res.status(400).json({
+            error: 'Invalid event ID or decision.'
+        });
     }
 
+    // Approve/reject pending proposals.
+    // Cancel only events that have already been approved.
+    const expectedStatus = status === 'cancelled'
+        ? 'approved'
+        : 'pending';
+
+    const updateSql = `
+        UPDATE events
+        SET approvalStatus = ?
+        WHERE eventId = ?
+          AND approvalStatus = ?
+    `;
+
     db.query(
-        'UPDATE events SET approvalStatus = ? WHERE eventId = ? AND approvalStatus = \'pending\'',
-        [status, eventId],
+        updateSql,
+        [status, eventId, expectedStatus],
         (err, result) => {
             if (err) {
                 console.error('Admin event decision update error:', err);
-                return res.status(500).json({ error: 'Unable to update this proposal.' });
+
+                return res.status(500).json({
+                    error: 'Unable to update this event. Check the approvalStatus column in your database.'
+                });
             }
+
             if (result.affectedRows === 0) {
-                return res.status(404).json({ error: 'Pending proposal not found.' });
+                return res.status(404).json({
+                    error: status === 'cancelled'
+                        ? 'Approved event not found. It may already have been cancelled or changed.'
+                        : 'Pending proposal not found. It may already have been reviewed.'
+                });
             }
 
             const fetchSql = `
-                SELECT events.eventId AS id, events.eventName AS title, events.description,
+                SELECT
+                    events.eventId AS id,
+                    events.eventName AS title,
+                    events.description,
                     CONCAT(head.firstName, ' ', head.lastName) AS organizerName,
-                    events.eventScope AS category, venues.venueName AS venue,
+                    events.eventScope AS category,
+                    venues.venueName AS venue,
                     DATE_FORMAT(events.eventDate, '%Y-%m-%d') AS eventDate,
                     TIME_FORMAT(events.startTime, '%H:%i:%s') AS startTime,
                     TIME_FORMAT(events.endTime, '%H:%i:%s') AS endTime,
-                    events.duration, events.approvalStatus AS status,
+                    events.duration,
+                    events.approvalStatus AS status,
                     DATE_FORMAT(events.createdAt, '%Y-%m-%d %H:%i:%s') AS submittedAt,
                     NULL AS reviewNote
                 FROM events
-                INNER JOIN accounts AS head ON events.headId = head.accountId
-                INNER JOIN venues ON events.venueId = venues.venueId
+                INNER JOIN accounts AS head
+                    ON events.headId = head.accountId
+                INNER JOIN venues
+                    ON events.venueId = venues.venueId
                 WHERE events.eventId = ?
             `;
+
             db.query(fetchSql, [eventId], (fetchErr, rows) => {
                 if (fetchErr) {
                     console.error('Admin event decision fetch error:', fetchErr);
-                    return res.status(500).json({ error: 'Decision was saved, but the updated event could not be loaded.' });
+
+                    return res.status(500).json({
+                        error: 'The status was saved, but the updated event could not be loaded.'
+                    });
                 }
-                return res.json({ success: true, event: rows[0], reviewNote });
+
+                return res.json({
+                    success: true,
+                    event: rows[0],
+                    reviewNote
+                });
             });
         }
     );
 });
+
 
 // Admin dashboard - admins only
 app.get('/admin', (req, res) => {
